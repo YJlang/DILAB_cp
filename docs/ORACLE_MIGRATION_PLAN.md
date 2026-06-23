@@ -63,8 +63,11 @@
 ### Phase 0 — 환경·분리 (완료 ✅, 2026-06-23)
 - [x] 복제본을 운영 repo에서 git 분리 (remote 제거, 새 init)
 - [x] 프로덕션 MCP(supabase·cloudflare×3) 제거, sentry·playwright 유지
-- [ ] **26ai Free** 인스턴스 확보 — Autonomous AI Database Free(클라우드, arm64 무관 → **권장**) 또는 로컬 Docker(arm64 이미지 가용성 확인). 한도: 사용자데이터 12GB·RAM 2GB(SGA+PGA)·**벡터풀 ~320만개**·동시 2프로세스·최대 65,535차원 → 우리 ~1,347×1024는 차고 넘침
-- [ ] `python-oracledb` 연결 PoC (thin 모드)
+- [x] **26ai Free** 인스턴스 확보 — Autonomous AI Database Free(클라우드 서울, Always Free). 한도: 사용자데이터 12GB·RAM 2GB(SGA+PGA)·벡터풀 ~320만개·최대 65,535차원 → 우리 ~1,347×1024는 차고 넘침
+- [x] `oracledb`(python-oracledb) 연결 PoC (thin 모드 + wallet mTLS) — `scripts/test_oracle_conn.py`. **검증됨 2026-06-23**: DB `Oracle AI Database 26ai 23.26.2.2.0`, `VECTOR_DISTANCE(...,COSINE)` 동작 확인.
+  - ⚠️ pip 패키지명은 **`oracledb`** (문서 별칭 "python-oracledb" 아님). `import oracledb`.
+  - 자격: `.env`(gitignore) — `ORACLE_USER/PASSWORD/DSN(dilab_high)/WALLET_DIR(secrets/wallet)/WALLET_PASSWORD`. Wallet zip·해제본은 `secrets/`(gitignore).
+- [ ] **(선택)** SQLcl MCP 등록 — 대화 중 직접 SQL 실행용 (개발 편의). Java 21 있음 + SQLcl 설치 필요.
 
 ### Phase 1 — 벡터 레이어 PoC (다음 작업)
 - [ ] `chunks` 스키마를 Oracle DDL로 변환 (`VECTOR(1024, FLOAT32)` + HNSW cosine)

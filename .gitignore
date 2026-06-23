@@ -33,3 +33,12 @@ build/
 # Runtime logs (ai-worker / cloudflared 로컬 로그)
 .run/*.log
 
+# Oracle 전환 — 비밀자격(Wallet·비번 등) 절대 커밋 금지
+secrets/
+*.zip
+Wallet_*
+cwallet.sso
+ewallet.*
+keystore.jks
+truststore.jks
+
