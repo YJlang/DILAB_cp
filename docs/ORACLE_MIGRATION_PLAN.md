@@ -4,13 +4,15 @@
 > 원본(운영 중): `/Users/junha/Desktop/DILAB` · `github.com/YJlang/DILAB` · `dilab.sean111400.workers.dev`
 > 이 복제본: git remote = `github.com/YJlang/DILAB_cp` (운영 repo와 분리된 별도 private repo) · 프로덕션 MCP(supabase·cloudflare) 제거됨.
 > 작성 AS_OF 2026-06-23. 근거: 옵시디언 「DILAB Oracle AI Vector Search 전환 타당성」(AS_OF 2026-06, 교수님 제안).
+>
+> **버전 표기 (AS_OF 2026-06-23):** 대상 제품은 현재 **`Oracle AI Database 26ai`** 다. 2025-10 Oracle AI World에서 23ai를 26ai로 리브랜딩(엔진 내부 버전은 여전히 `23.26.x` — `26`은 출시 연도). 23ai 환경은 2025-10 RU 패치만으로 26ai가 됨(DB 업그레이드·앱 재인증 불필요). 이 문서는 **26ai**로 표기하되 엔진 계보가 23.x임을 전제로 함.
 
 ---
 
 ## 0. 왜 이 작업인가 (배경)
 
 수요기업(한국콜마·테팔 등)이 **보안성 높고 검증된** 솔루션을 원함. 현재 DILAB의 벡터 레이어는
-오픈소스 **pgvector**(Supabase)로 구현돼 있어, 이를 **Oracle AI Vector Search(23ai)** 로
+오픈소스 **pgvector**(Supabase)로 구현돼 있어, 이를 **Oracle AI Vector Search(26ai)** 로
 대체하는 산학 과제를 검토 중(오라클 협력 과제 제안). 성능이 아니라 **엔터프라이즈 보안·거버넌스·
 검증된 벤더**가 전환의 명분이다.
 
@@ -26,16 +28,16 @@
 | 관측 | Sentry (Modal Python 계측) | 유지 |
 | 규모 | chunks **~1,347행·17MB**, 16테이블, RLS 18개 | 이전 부담 거의 0 |
 
-## 2. Oracle 23ai 대응 — 벡터는 거의 1:1
+## 2. Oracle 26ai 대응 — 벡터는 거의 1:1
 
-| pgvector (현재) | Oracle 23ai | 난이도 |
+| pgvector (현재) | Oracle 26ai | 난이도 |
 |---|---|---|
 | `vector(1024)` | `VECTOR(1024, FLOAT32)` | 쉬움 |
 | HNSW (cosine) | HNSW (cosine) — 정식 지원 (`VECTOR_MEMORY_SIZE` 필요) | 쉬움 |
 | `embedding <=> q` | `VECTOR_DISTANCE(embedding, q, COSINE)` | 쉬움 |
 | 외부 BGE-M3 벡터 INSERT | `python-oracledb` / `node-oracledb` 로 그대로 INSERT | 쉬움 — **임베딩 파이프라인 변경 거의 없음** |
 
-→ 상세: 옵시디언 「Oracle AI Vector Search (23ai)」
+→ 상세: 옵시디언 「Oracle AI Vector Search (26ai)」 · **26ai 신규**: Unified Hybrid Vector Search(벡터+관계형/JSON/그래프 필터를 한 SQL로) — 우리 `match_chunks`(벡터+도메인/제품/출처+전문가우선)와 동형이라 매핑이 깔끔.
 
 ## 3. 진짜 비용은 "부가기능 이전" (벡터가 아님)
 
@@ -61,7 +63,7 @@
 ### Phase 0 — 환경·분리 (완료 ✅, 2026-06-23)
 - [x] 복제본을 운영 repo에서 git 분리 (remote 제거, 새 init)
 - [x] 프로덕션 MCP(supabase·cloudflare×3) 제거, sentry·playwright 유지
-- [ ] 23ai Free(12GB·2CPU) 인스턴스 확보 (Autonomous DB Free 또는 로컬 컨테이너)
+- [ ] **26ai Free** 인스턴스 확보 — Autonomous AI Database Free(클라우드, arm64 무관 → **권장**) 또는 로컬 Docker(arm64 이미지 가용성 확인). 한도: 사용자데이터 12GB·RAM 2GB(SGA+PGA)·**벡터풀 ~320만개**·동시 2프로세스·최대 65,535차원 → 우리 ~1,347×1024는 차고 넘침
 - [ ] `python-oracledb` 연결 PoC (thin 모드)
 
 ### Phase 1 — 벡터 레이어 PoC (다음 작업)
@@ -85,7 +87,7 @@
 
 ## 6. 트레이드오프·주의
 
-- **운영비**: 현재 월 ≈ $0 (CF+Supabase+Modal) ↔ Oracle(Autonomous/자체호스팅). **23ai Free는 12GB 한도** — PoC엔 충분.
+- **운영비**: 현재 월 ≈ $0 (CF+Supabase+Modal) ↔ Oracle(Autonomous/자체호스팅). **26ai Free는 사용자데이터 12GB·벡터풀 ~320만개 한도** — PoC엔 충분.
 - **성능**: 현 규모(~1.3K행)에선 둘 다 무의미하게 빠름. Oracle 강점은 **대규모·보안·거버넌스**.
 - **운영 repo 영향 금지**: 이 복제본 작업은 원본 `github.com/YJlang/DILAB`와 운영 데모에 **절대 영향 없어야 함**. push·프로덕션 백엔드 변경 금지.
 
@@ -104,6 +106,6 @@
 ## 8. 🔗 근거 (옵시디언 거대한 뇌)
 
 - 「DILAB Oracle AI Vector Search 전환 타당성」 (프로젝트)
-- 「Oracle AI Vector Search (23ai)」 (백엔드 reference)
+- 「Oracle AI Vector Search (26ai)」 (백엔드 reference)
 - 「벡터 DB 마이그레이션의 진짜 비용은 부가기능 이전」 (백엔드 패턴)
 - 「DILAB (제품평가 RAG 시스템)」 (프로젝트 허브)
