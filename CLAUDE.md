@@ -6,7 +6,7 @@
 >
 > **이곳은 운영 repo가 아니라 Oracle 전환 R&D용 *분리된 복제본*입니다.** (AS_OF 2026-06-23)
 > - **운영 원본**(건드리지 말 것): `/Users/junha/Desktop/DILAB` · `github.com/YJlang/DILAB` · 데모 `dilab.sean111400.workers.dev` (실서비스 운영 중).
-> - **이 복제본**: git **remote 없음**(운영 repo와 완전 분리). 프로덕션 MCP(supabase·cloudflare)도 제거됨 → 남은 MCP는 `sentry`·`playwright`뿐.
+> - **이 복제본**: git remote = **`github.com/YJlang/DILAB_cp`** (운영 repo `DILAB`와 분리된 별도 private repo). 프로덕션 MCP(supabase·cloudflare)도 제거됨 → 남은 MCP는 `sentry`·`playwright`뿐.
 > - **목적**: 벡터 레이어를 **pgvector(Supabase) → Oracle AI Vector Search(23ai)** 로 전환하는 산학 과제. 상세 로드맵은 [`docs/ORACLE_MIGRATION_PLAN.md`](docs/ORACLE_MIGRATION_PLAN.md).
 > - **절대 금지**: 운영 원본 repo로 push, 운영 데모/프로덕션 백엔드(Supabase·Cloudflare) 변경. 이 복제본 작업이 실서비스에 영향을 주면 안 됨.
 

@@ -2,7 +2,7 @@
 
 > **이 저장소는 운영 repo가 아니라 Oracle 전환 R&D용 *분리된 복제본*입니다.**
 > 원본(운영 중): `/Users/junha/Desktop/DILAB` · `github.com/YJlang/DILAB` · `dilab.sean111400.workers.dev`
-> 이 복제본: git remote 없음(완전 분리) · 프로덕션 MCP(supabase·cloudflare) 제거됨.
+> 이 복제본: git remote = `github.com/YJlang/DILAB_cp` (운영 repo와 분리된 별도 private repo) · 프로덕션 MCP(supabase·cloudflare) 제거됨.
 > 작성 AS_OF 2026-06-23. 근거: 옵시디언 「DILAB Oracle AI Vector Search 전환 타당성」(AS_OF 2026-06, 교수님 제안).
 
 ---
