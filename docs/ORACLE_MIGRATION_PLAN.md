@@ -72,16 +72,29 @@
   - SQLcl 비번에 `@` 포함 시 인라인 파싱 깨짐 → 따옴표(`user/"pwd"@dsn`)로 저장.
   - ⚠️ Claude Code가 새 MCP를 인식하려면 **세션 리로드/재시작 + 신뢰 승인** 필요.
 
-### Phase 1 — 벡터 레이어 PoC (다음 작업)
-- [ ] `chunks` 스키마를 Oracle DDL로 변환 (`VECTOR(1024, FLOAT32)` + HNSW cosine)
-- [ ] 현재 Supabase의 chunks ~1,347행 + 1024d 벡터 export → Oracle INSERT
-- [ ] `VECTOR_DISTANCE(..., COSINE)` Top-K 결과가 **`match_chunks`와 일치**하는지 왕복 검증 (소규모라 빠름)
-- [ ] 도메인/제품/출처 필터 + 전문가 우선 로직을 Oracle 쿼리로 재현
+### Phase 1 — 벡터 레이어 PoC ✅ 완료 (2026-06-23)
+- [x] `chunks` → Oracle DDL (`VECTOR(1024, FLOAT32)` + HNSW cosine) — `scripts/`로 생성, Free에서 인덱스 작동
+- [x] Supabase chunks **1,347행 + 1024d 벡터** (읽기 전용) → Oracle INSERT — `scripts/load_chunks_to_oracle.py`
+- [x] `VECTOR_DISTANCE` Top-K ↔ `match_chunks` 왕복 검증 — `scripts/validate_vector_search.py` (표본 2/3 순서 완전일치, 1개 ANN 꼬리차)
+- [x] 도메인/제품/출처 필터 + 전문가 우선 → Oracle 하이브리드 SQL 재현·검증 — `scripts/validate_match_chunks_full.py` (필터·prefer_expert **순서 완전일치**)
 
-### Phase 2 — 부가기능 이전 공수 산정 (시나리오 A)
-- [ ] RLS 18개 → VPD/앱계층 매핑표 작성, 공수 산정
-- [ ] Auth 대체 설계
-- [ ] `match_chunks` 외 SQL 함수·RPC 인벤토리 → 재작성 계획
+### Phase 2 — 부가기능 이전 공수 산정 (시나리오 A) — 진행 중
+- [x] **`match_chunks` 재현 완료** (위 Phase 1-4) → Oracle 하이브리드 SQL/뷰로 1:1 대체 가능
+- [ ] RLS → VPD/앱계층 매핑 (아래 표) → 정책 구현
+- [ ] **Auth 대체 설계** (최대 난관 — 아래)
+- [ ] 나머지 RPC/트리거 재작성
+
+#### 부가기능 → Oracle 매핑·공수
+| Supabase 기능 | 역할 | Oracle 이전 | 공수 |
+|---|---|---|---|
+| RLS-A: 도메인 `is_public`/owner read (chunks·topics·classifications·sentiments·ratings·journey) | 분석데이터 가시성 | VPD(`DBMS_RLS`) 정책 + `SYS_CONTEXT` 로 owner 주입, 또는 앱계층 WHERE | 중 |
+| RLS-B: 본인 행만 (ask_queries·reports) | 사용자 데이터 격리 | VPD + 앱 컨텍스트(user_id) | 중 |
+| Write = service_role only | 쓰기 차단 | 워커는 권한 스키마로 접속, 읽기 유저는 제한 grant + VPD | 소 |
+| `auth.uid()` (Supabase Auth) | 사용자 식별(JWT) | **대체 필요**: 인증은 앱/외부 IdP가 담당 → 인증된 user_id를 `DBMS_SESSION.SET_CONTEXT` 로 주입해 VPD가 사용 | **대(최대 난관)** |
+| `match_chunks` RPC | 벡터 검색 | ✅ 하이브리드 SQL 재현 완료 | 완료 |
+| `handle_new_user` 트리거 | 가입 시 user 행 생성 | Auth 대체에 종속 (앱계층/Oracle 트리거) | 중 |
+| PostgREST 자동 REST | 자동 API | 없음 → Next.js API + `node-oracledb` 직접 쿼리 | 중 |
+> **핵심 결론**: 벡터·검색은 끝났고(✅), 남은 공수는 **Auth(=`auth.uid()`) 대체**에 집중됨. 인증 주체를 앱/IdP로 옮기고 그 신원을 Oracle 세션 컨텍스트로 넘겨 VPD가 RLS를 대신하게 하는 설계가 Phase 2의 산.
 
 ### Phase 3 — 앱 통합
 - [ ] `lib/rag.ts`(node-oracledb) · `answer.py`(python-oracledb) 검색 호출부 교체
