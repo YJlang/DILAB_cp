@@ -49,7 +49,7 @@ def fetch_supabase() -> list[dict]:
             sb.table("chunks")
             .select(
                 "id, document_id, domain_id, chunk_index, text, token_count, "
-                "embedding, documents(product_id, source_type)"
+                "embedding, documents(product_id, source_type, author, author_credibility)"
             )
             .range(start, start + PAGE - 1)
             .execute()
@@ -84,6 +84,8 @@ def main() -> None:
                 r.get("text") or "",
                 r.get("token_count"),
                 _to_floats(emb),
+                doc.get("author"),
+                doc.get("author_credibility"),
             )
         )
 
@@ -101,8 +103,8 @@ def main() -> None:
         cur.executemany(
             """INSERT INTO chunks
                (id, document_id, domain_id, product_id, source_type,
-                chunk_index, text, token_count, embedding)
-               VALUES (:1,:2,:3,:4,:5,:6,:7,:8,:9)""",
+                chunk_index, text, token_count, embedding, author, author_credibility)
+               VALUES (:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11)""",
             payload,
         )
         conn.commit()
