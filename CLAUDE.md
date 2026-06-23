@@ -8,6 +8,8 @@
 > - **운영 원본**(건드리지 말 것): `/Users/junha/Desktop/DILAB` · `github.com/YJlang/DILAB` · 데모 `dilab.sean111400.workers.dev` (실서비스 운영 중).
 > - **이 복제본**: git remote = **`github.com/YJlang/DILAB_cp`** (운영 repo `DILAB`와 분리된 별도 private repo). 프로덕션 MCP(supabase·cloudflare)도 제거됨 → 남은 MCP는 `sentry`·`playwright`뿐.
 > - **목적**: 벡터 레이어를 **pgvector(Supabase) → Oracle AI Vector Search(26ai)** 로 전환하는 산학 과제. (※ "26ai" = 현재 브랜드 `Oracle AI Database 26ai`, 엔진 계보는 23.x — 옛 명칭 23ai) 상세 로드맵은 [`docs/ORACLE_MIGRATION_PLAN.md`](docs/ORACLE_MIGRATION_PLAN.md).
+> - **진행 상태 (AS_OF 2026-06-23)**: Phase 0(환경·분리)·Phase 1(벡터 적재·검색 동등성 검증) ✅, Phase 2(부가기능 매핑) 분석 완료. `match_chunks`는 Oracle 하이브리드 SQL로 재현 검증됨.
+> - **스코프 결정**: **단일 테넌트 먼저**(모두 공개 도메인·로그인 없음 → Auth/VPD 생략) → Phase 3 앱 통합부터. **멀티테넌트**(고객사별 private 도메인·로그인 = `auth.uid()`→Oracle 세션컨텍스트+VPD)는 **나중**. 남은 핵심 난관은 Auth 대체뿐.
 > - **절대 금지**: 운영 원본 repo로 push, 운영 데모/프로덕션 백엔드(Supabase·Cloudflare) 변경. 이 복제본 작업이 실서비스에 영향을 주면 안 됨.
 
 ## 1. 프로젝트 정체성
