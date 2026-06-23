@@ -1,0 +1,35 @@
+# Claude Code — 로컬 전용 (개인별 권한 설정)
+.claude/settings.local.json
+.claude/.session/
+.claude/projects/
+
+# OS
+Thumbs.db
+.DS_Store
+desktop.ini
+
+# Editor
+.idea/
+.vscode/
+*.swp
+*~
+
+# Python (추후 MVP 백엔드용)
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.env
+.env.local
+
+# Node (추후 MVP 프론트용)
+node_modules/
+dist/
+build/
+.next/
+.open-next/
+.wrangler/
+
+# Runtime logs (ai-worker / cloudflared 로컬 로그)
+.run/*.log
+

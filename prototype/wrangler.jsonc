@@ -1,0 +1,31 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "main": ".open-next/worker.js",
+  "name": "dilab",
+  "compatibility_date": "2026-05-27",
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS"
+  },
+  "images": {
+    "binding": "IMAGES"
+  },
+  "ai": {
+    "binding": "AI"
+  },
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 1
+  },
+  "keep_vars": true,
+  "vars": {
+    "SUPABASE_URL": "https://mxofuzhfdthqpzhzctwd.supabase.co",
+    "SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im14b2Z1emhmZHRocXB6aHpjdHdkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3NjY5OTMsImV4cCI6MjA5NDM0Mjk5M30.cAKd8G_ft-vM0mDwxowjV01A6igcmYTRWJtR4sk5IFE",
+    "DEEPSEEK_BASE_URL": "https://api.deepseek.com",
+    "LLM_MODEL": "deepseek-chat",
+    "MODAL_TRIGGER_URL": "https://yjlang--dilab-analyze-trigger.modal.run",
+    "MODAL_COMPARE_URL": "https://yjlang--dilab-analyze-compare.modal.run",
+    "MODAL_REPORT_URL": "https://yjlang--dilab-analyze-report-pdf.modal.run"
+  }
+}

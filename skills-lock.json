@@ -1,0 +1,26 @@
+{
+  "version": 1,
+  "skills": {
+    "designing-nextjs-ui": {
+      "source": "AbdullahMalik17/Digital-FTE",
+      "ref": "main",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/designing-nextjs-ui/SKILL.md",
+      "computedHash": "c65a3257abc211ad7e9b09af126b2aa3ad168ade9d58a98de28672c9ce07b1af"
+    },
+    "responsive-mobile-first": {
+      "source": "adi0900/CmcS-Workflow",
+      "ref": "main",
+      "sourceType": "github",
+      "skillPath": "skills/responsive-patterns/SKILL.md",
+      "computedHash": "c106e404d510cae3f3ee6fae590e8b0b520129a84b29ef07902d6bc96bef78a7"
+    },
+    "ui-ux-pro-max": {
+      "source": "nextlevelbuilder/ui-ux-pro-max-skill",
+      "ref": "main",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/ui-ux-pro-max/SKILL.md",
+      "computedHash": "6337038fe1fe6bbe1b9f252ab678ee575859190bab6f0f246f4061824eb40875"
+    }
+  }
+}

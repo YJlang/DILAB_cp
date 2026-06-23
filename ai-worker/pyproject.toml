@@ -1,0 +1,49 @@
+[project]
+name = "dilab-ai-worker"
+version = "0.1.0"
+description = "DILAB AI worker — BGE-M3 임베딩, BERTopic 토픽, Claude LLM, RAG 파이프라인"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi>=0.110.0",
+    "uvicorn[standard]>=0.27.0",
+    "pydantic>=2.5.0",
+    "pydantic-settings>=2.1.0",
+    "supabase>=2.4.0",
+    "sentence-transformers>=2.6.0",
+    "openai>=1.30.0",
+    "bertopic>=0.16.0",
+    "python-dotenv>=1.0.0",
+    "httpx>=0.26.0",
+    "hangul-romanize>=0.1.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "ruff>=0.3.0",
+    "pytest>=8.0.0",
+    "pytest-asyncio>=0.23.0",
+]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+ignore = ["E501"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+
+[tool.pyright]
+# scripts/*.py 는 sys.path.insert 후 `src.*` 로 import.
+# import root 를 ai-worker 루트로 잡아 정적 분석에서 인식되게 함.
+extraPaths = ["."]
+

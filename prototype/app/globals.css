@@ -1,0 +1,65 @@
+@import "tailwindcss";
+
+/* DILAB 디자인 토큰 v2.0 — DESIGN.md §3 (Research Editorial). 라이트 전용 warm ivory.
+   @theme 으로 의미 유틸 생성: bg-ivory / bg-card / text-ink / text-ink-soft /
+   text-muted / border-line / text-brand / bg-brand-soft / text-accent / bg-accent-soft / font-display.
+   sentiment 3색(positive/neutral/negative)은 Tailwind 기본 emerald-500/stone-400/rose-500 직접 사용. */
+@theme {
+  --color-ivory: #fbfaf7;
+  --color-card: #ffffff;
+  --color-ink: #1a1a1a;
+  --color-ink-soft: #44403c;
+  --color-muted: #78716c;
+  --color-line: #e7e5e4;
+
+  --color-brand: #4338ca;
+  --color-brand-soft: #eef2ff;
+  --color-accent: #b45309;
+  --color-accent-soft: #fef3c7;
+
+  --font-display: "Instrument Serif", Georgia, "Times New Roman", serif;
+}
+
+html,
+body {
+  background: var(--color-ivory);
+  color: var(--color-ink);
+  font-family: "Pretendard", -apple-system, BlinkMacSystemFont, system-ui,
+    "Apple SD Gothic Neo", "Noto Sans KR", "Segoe UI", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-variant-numeric: tabular-nums;
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* 리포트 인쇄/PDF — 배경색을 그대로 출력(점수 바·칩 색 유지). */
+.report-doc {
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+@media print {
+  @page {
+    size: A4;
+    margin: 12mm;
+  }
+  html,
+  body {
+    background: #fff;
+  }
+}
+
+/* DESIGN.md §3.5 / §7 — reduced-motion 사용자는 모든 모션 비활성. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0s !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0s !important;
+    scroll-behavior: auto !important;
+  }
+}

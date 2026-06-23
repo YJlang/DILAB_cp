@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=1440, initial-scale=1.0" />
+<title>DILAB — 퓨어 비건 클렌징 폼 평가 리포트 (S1 목업)</title>
+
+<!-- Pretendard (한국어 + 가독성 최우선) -->
+<link rel="stylesheet" as="style" crossorigin
+  href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
+
+<!-- Tailwind CDN (프로토타입용. 실제 빌드 시 PostCSS 로 교체) -->
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        fontFamily: { sans: ['Pretendard', 'system-ui', 'sans-serif'] },
+        colors: {
+          ink:   { 900: '#0F172A', 700: '#334155', 500: '#64748B', 300: '#CBD5E1' },
+          paper: { 50: '#FAFAF9', 100: '#F5F5F4', 200: '#E7E5E4' },
+          brand: { 50: '#EEF2FF', 100: '#E0E7FF', 500: '#6366F1', 600: '#4F46E5', 700: '#4338CA' },
+          accent:{ 50: '#FEF3C7', 100: '#FDE68A', 400: '#FBBF24', 500: '#F59E0B', 700: '#B45309' }, /* 머스타드 옐로우 (amber tone) */
+          mute:  { 400: '#9CA3AF', 500: '#6B7280', 600: '#4B5563' } /* 부정은 회색 */
+        },
+        boxShadow: {
+          card: '0 1px 2px rgba(15,23,42,0.04), 0 1px 3px rgba(15,23,42,0.06)'
+        }
+      }
+    }
+  };
+</script>
+<style>
+  html, body { background: #FAFAF9; color: #0F172A; font-family: Pretendard, system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+  .num { font-variant-numeric: tabular-nums; }
+  .ring-dot { stroke: #CBD5E1; stroke-dasharray: 2 3; fill: none; }
+  .radar-cat { fill: rgba(245, 158, 11, 0.10); stroke: #F59E0B; stroke-width: 1.5; stroke-dasharray: 3 3; }
+  .radar-prod { fill: rgba(79, 70, 229, 0.18); stroke: #4F46E5; stroke-width: 2; }
+  .radar-prod-dot { fill: #4F46E5; }
+  .axis-line { stroke: #E7E5E4; }
+  .axis-label { fill: #334155; font-size: 11px; font-weight: 600; }
+  .axis-value { fill: #4F46E5; font-size: 10px; font-weight: 700; }
+  .pill { display:inline-flex; align-items:center; gap:0.25rem; padding:0.25rem 0.5rem; border-radius:9999px; font-size:0.75rem; font-weight:500; }
+  .ckbd { background-image: linear-gradient(45deg, #F5F5F4 25%, transparent 25%), linear-gradient(-45deg, #F5F5F4 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #F5F5F4 75%), linear-gradient(-45deg, transparent 75%, #F5F5F4 75%); background-size: 8px 8px; background-position: 0 0, 0 4px, 4px -4px, -4px 0; }
+</style>
+</head>
+
+<body class="text-ink-900">
+
+<!-- ──────── 상단 네비 ──────── -->
+<header class="border-b border-paper-200 bg-white sticky top-0 z-20">
+  <div class="max-w-[1400px] mx-auto px-6 h-14 flex items-center gap-4">
+    <div class="flex items-center gap-2 font-bold text-lg tracking-tight">
+      <span class="inline-block w-7 h-7 rounded-md bg-brand-600 text-white grid place-items-center text-xs">D</span>
+      DILAB
+    </div>
+
+    <button class="ml-2 flex items-center gap-1.5 text-sm font-medium px-3 py-1.5 rounded-md hover:bg-paper-100 border border-paper-200">
+      🌿 화장품 <span class="text-ink-500">▼</span>
+    </button>
+
+    <div class="flex-1 flex items-center bg-paper-100 rounded-md px-3 h-9 max-w-xl">
+      <span class="text-ink-500 mr-2">🔍</span>
+      <input class="bg-transparent flex-1 text-sm outline-none placeholder-ink-500"
+             placeholder='제품명, 성분, 또는 "민감성 피부" 같은 키워드로...' />
+    </div>
+
+    <div class="flex items-center gap-1.5 text-sm">
+      <button class="px-3 py-1.5 rounded-md hover:bg-paper-100 border border-paper-200">PDF ↓</button>
+      <button class="px-3 py-1.5 rounded-md hover:bg-paper-100 border border-paper-200">공유 ↗</button>
+      <button class="px-2 py-1.5 rounded-md hover:bg-paper-100">⚙</button>
+    </div>
+  </div>
+</header>
+
+<!-- ──────── 메인 ──────── -->
+<main class="max-w-[1400px] mx-auto px-6 py-6">
+
+  <!-- 제품 헤더 -->
+  <section class="flex items-end justify-between mb-4">
+    <div>
+      <h1 class="text-2xl font-bold tracking-tight">퓨어 비건 클렌징 폼</h1>
+      <p class="text-sm text-ink-500 mt-0.5">
+        브랜드 P · 스킨케어 / 클렌저
+        <span class="mx-2 text-ink-300">|</span>
+        <span class="num">2026-05-26 분석 · 어제 데이터 기준</span>
+      </p>
+    </div>
+    <div class="flex items-center gap-2">
+      <button class="text-sm px-3 py-1.5 rounded-md hover:bg-paper-100 border border-paper-200">🤍 저장</button>
+      <button class="text-sm px-3 py-1.5 rounded-md hover:bg-paper-100 border border-paper-200">👀 비교에 추가</button>
+    </div>
+  </section>
+
+  <!-- ① 한 줄 결론 -->
+  <section class="mb-5">
+    <div class="bg-accent-50/60 border-l-4 border-accent-500 rounded-md px-5 py-4">
+      <div class="text-xs font-semibold text-accent-700 mb-1 tracking-wide uppercase">💬 한 줄 결론</div>
+      <p class="text-[15px] leading-relaxed text-ink-900">
+        민감성 피부에 살살한 폼이에요. 가벼운 메이크업이면 OK,
+        진한 색조 메이크업엔 세정력이 살짝 부족할 수 있어요. <span class="text-accent-700">👇</span>
+      </p>
+    </div>
+  </section>
+
+  <!-- 본문 그리드 -->
+  <section class="grid grid-cols-12 gap-5">
+
+    <!-- ──── 좌측: 분석 시각화 ──── -->
+    <div class="col-span-8 space-y-5">
+
+      <!-- ② 5축 레이더 -->
+      <div class="bg-white rounded-lg border border-paper-200 shadow-card p-5">
+        <div class="flex items-baseline justify-between mb-3">
+          <h2 class="text-base font-bold">이 제품의 5가지 강점·약점</h2>
+          <span class="text-xs text-ink-500">💡 축에 마우스를 올리면 점수의 이유가 보여요</span>
+        </div>
+
+        <div class="grid grid-cols-2 gap-5 items-center">
+          <!-- 5각형 레이더 SVG (정오각형) -->
+          <div class="flex justify-center">
+            <svg width="280" height="280" viewBox="-140 -140 280 280" aria-label="5축 레이더 차트">
+              <!-- 동심 5각형 그리드 (4단계: 2.5/5/7.5/10) -->
+              <!-- 정오각형 꼭짓점: angle = -90 + i*72, i in 0..4 -->
+              <!-- r = 120 at score 10 -->
+              <g class="ring-dot">
+                <polygon points="0,-30  28.53,-9.27  17.63,24.27  -17.63,24.27  -28.53,-9.27" />
+                <polygon points="0,-60  57.06,-18.54 35.27,48.54 -35.27,48.54 -57.06,-18.54" />
+                <polygon points="0,-90  85.60,-27.81 52.90,72.81 -52.90,72.81 -85.60,-27.81" />
+                <polygon points="0,-120 114.13,-37.08 70.53,97.08 -70.53,97.08 -114.13,-37.08" />
+              </g>
+              <!-- 축 선 -->
+              <g class="axis-line">
+                <line x1="0" y1="0" x2="0"      y2="-120" />
+                <line x1="0" y1="0" x2="114.13" y2="-37.08" />
+                <line x1="0" y1="0" x2="70.53"  y2="97.08" />
+                <line x1="0" y1="0" x2="-70.53" y2="97.08" />
+                <line x1="0" y1="0" x2="-114.13" y2="-37.08" />
+              </g>
+
+              <!-- 카테고리 평균 (점선, 황색) — 평균 7.0 -->
+              <polygon class="radar-cat"
+                points="0,-84  79.89,-25.96 49.37,67.95 -49.37,67.95 -79.89,-25.96" />
+
+              <!-- 제품 점수 (인디고): 효능 7.5, 성분 8.2, 가격 6.8, 사용감 7.0, 안전성 9.1 -->
+              <!-- 좌표 = (r * cos(angle), r * sin(angle)), angle from north -->
+              <!-- 효능 7.5 → r=90:  (0, -90) -->
+              <!-- 성분 8.2 → r=98.4: angle -18°: (93.59, -30.40) -->
+              <!-- 가격 6.8 → r=81.6: angle 54°: (47.95, 66.01) -->
+              <!-- 사용감 7.0 → r=84: angle 126°: (-49.37, 67.95) -->
+              <!-- 안전성 9.1 → r=109.2: angle 198°: (-103.86, -33.74) -->
+              <polygon class="radar-prod"
+                points="0,-90 93.59,-30.40 47.95,66.01 -49.37,67.95 -103.86,-33.74" />
+              <g class="radar-prod-dot">
+                <circle cx="0"        cy="-90"   r="3.5" />
+                <circle cx="93.59"    cy="-30.40" r="3.5" />
+                <circle cx="47.95"    cy="66.01"  r="3.5" />
+                <circle cx="-49.37"   cy="67.95"  r="3.5" />
+                <circle cx="-103.86"  cy="-33.74" r="3.5" />
+              </g>
+
+              <!-- 축 라벨 + 값 -->
+              <g>
+                <text class="axis-label" x="0"       y="-128" text-anchor="middle">효능</text>
+                <text class="axis-value" x="0"       y="-115" text-anchor="middle">7.5</text>
+
+                <text class="axis-label" x="125"     y="-37"  text-anchor="start">성분</text>
+                <text class="axis-value" x="105"     y="-23"  text-anchor="start">8.2</text>
+
+                <text class="axis-label" x="78"      y="115"  text-anchor="start">가격</text>
+                <text class="axis-value" x="60"      y="80"   text-anchor="start">6.8</text>
+
+                <text class="axis-label" x="-78"     y="115"  text-anchor="end">사용감</text>
+                <text class="axis-value" x="-60"     y="80"   text-anchor="end">7.0</text>
+
+                <text class="axis-label" x="-125"    y="-37"  text-anchor="end">안전성</text>
+                <text class="axis-value" x="-105"    y="-23"  text-anchor="end">9.1</text>
+              </g>
+            </svg>
+          </div>
+
+          <!-- 레이더 우측 요약 -->
+          <div class="space-y-3 text-sm">
+            <div class="flex items-baseline gap-2">
+              <span class="text-3xl font-bold text-brand-600 num">7.7</span>
+              <span class="text-ink-500">/ 10 종합 점수</span>
+            </div>
+            <div class="text-ink-700 leading-relaxed">
+              카테고리 평균 <span class="num font-semibold text-accent-700">7.0</span>점 보다
+              <span class="font-semibold text-brand-700">+0.7점</span> 높아요.
+            </div>
+            <ul class="space-y-1.5 mt-3">
+              <li class="flex justify-between gap-3">
+                <span class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-brand-600"></span> 이 제품</span>
+                <span class="num font-semibold text-brand-600">7.7</span>
+              </li>
+              <li class="flex justify-between gap-3 text-ink-500">
+                <span class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-accent-500"></span> 카테고리 평균 (n=12)</span>
+                <span class="num font-semibold">7.0</span>
+              </li>
+            </ul>
+            <div class="mt-4 pt-3 border-t border-paper-200 text-xs text-ink-500 space-y-2">
+              <div>
+                가장 강한 축은 <span class="font-semibold text-ink-900">안전성 (9.1)</span>,
+                가장 약한 축은 <span class="font-semibold text-ink-900">가격 (6.8)</span> 이에요.
+              </div>
+              <div class="text-mute-500 text-[11px] leading-relaxed pt-2 border-t border-paper-200">
+                💡 hover 시 근거 인용은 MVP 단계에선 <span class="font-semibold">강한 축·약한 축 2개만</span> 노출돼요. (LLM 호출 비용 절감)
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ③ 감성 분포 + 사유 -->
+      <div class="bg-white rounded-lg border border-paper-200 shadow-card p-5">
+        <div class="flex items-baseline justify-between mb-4">
+          <h2 class="text-base font-bold">리뷰 132개의 분위기 한눈에</h2>
+          <span class="text-xs text-ink-500">막대를 클릭하면 시간순 흐름이 보여요</span>
+        </div>
+
+        <div class="space-y-2.5 mb-4">
+          <div class="flex items-center gap-3">
+            <span class="w-24 text-sm">😊 좋아요</span>
+            <div class="flex-1 h-5 bg-paper-100 rounded-sm overflow-hidden">
+              <div class="h-full bg-brand-500" style="width: 68%"></div>
+            </div>
+            <span class="num text-sm font-semibold w-10 text-right">68%</span>
+          </div>
+          <div class="flex items-center gap-3">
+            <span class="w-24 text-sm">😐 그저그래요</span>
+            <div class="flex-1 h-5 bg-paper-100 rounded-sm overflow-hidden">
+              <div class="h-full bg-accent-400" style="width: 22%"></div>
+            </div>
+            <span class="num text-sm font-semibold w-10 text-right">22%</span>
+          </div>
+          <div class="flex items-center gap-3">
+            <span class="w-24 text-sm">😣 아쉬워요</span>
+            <div class="flex-1 h-5 bg-paper-100 rounded-sm overflow-hidden">
+              <div class="h-full bg-mute-500" style="width: 10%"></div>
+            </div>
+            <span class="num text-sm font-semibold w-10 text-right">10%</span>
+          </div>
+        </div>
+
+        <div class="bg-paper-50 rounded-md px-4 py-3 text-sm">
+          <div class="font-semibold mb-2 text-ink-700">아쉬워한 이유는?</div>
+          <div class="flex flex-wrap gap-x-5 gap-y-1.5 text-ink-700">
+            <span>👃 향이 거슬려요 <span class="num text-mute-600">(53%)</span></span>
+            <span>🫧 거품이 좀 부족해요 <span class="num text-mute-600">(31%)</span></span>
+            <span>📦 용기가 불편해요 <span class="num text-mute-600">(11%)</span></span>
+            <span class="text-mute-500">기타 (5%)</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ④ 토픽 키워드 -->
+      <div class="bg-white rounded-lg border border-paper-200 shadow-card p-5">
+        <div class="flex items-baseline justify-between mb-3">
+          <h2 class="text-base font-bold">사람들이 자주 말하는 키워드 (8개)</h2>
+          <span class="text-xs text-ink-500">▸ 키워드 클릭 → 비슷한 리뷰 모아보기</span>
+        </div>
+        <div class="flex flex-wrap gap-2">
+          <span class="pill bg-brand-50 text-brand-700 border border-brand-100">💧 보습 <span class="num text-brand-500 ml-1">·41</span></span>
+          <span class="pill bg-brand-50 text-brand-700 border border-brand-100">🧼 세정력 <span class="num text-brand-500 ml-1">·38</span></span>
+          <span class="pill bg-brand-50 text-brand-700 border border-brand-100">⚖️ pH <span class="num text-brand-500 ml-1">·22</span></span>
+          <span class="pill bg-brand-50 text-brand-700 border border-brand-100">🌱 민감성 <span class="num text-brand-500 ml-1">·19</span></span>
+          <span class="pill bg-paper-100 text-ink-700 border border-paper-200">🌸 향 <span class="num text-mute-500 ml-1">·17</span></span>
+          <span class="pill bg-brand-50 text-brand-700 border border-brand-100">⏱️ 지속력 <span class="num text-brand-500 ml-1">·14</span></span>
+          <span class="pill bg-brand-50 text-brand-700 border border-brand-100">💰 가성비 <span class="num text-brand-500 ml-1">·12</span></span>
+          <span class="pill bg-paper-100 text-ink-700 border border-paper-200">📦 용기 <span class="num text-mute-500 ml-1">·9</span></span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ──── 우측 사이드: 출처 + 추천 ──── -->
+    <aside class="col-span-4 space-y-5">
+
+      <!-- ★ 출처 카드 -->
+      <div class="bg-white rounded-lg border border-paper-200 shadow-card p-5">
+        <div class="text-xs font-semibold text-ink-500 mb-2 tracking-wide">📚 어디서 가져온 정보?</div>
+
+        <div class="flex items-center justify-between mb-1">
+          <span class="text-sm">👩‍🔬 전문가 의견</span>
+          <span class="num font-semibold">8건</span>
+        </div>
+        <div class="h-2 bg-paper-100 rounded-sm overflow-hidden mb-3">
+          <div class="h-full bg-brand-500" style="width: 100%"></div>
+        </div>
+
+        <div class="flex items-center justify-between mb-1">
+          <span class="text-sm">👥 일반 사용자</span>
+          <span class="num font-semibold">132명</span>
+        </div>
+        <div class="h-2 bg-paper-100 rounded-sm overflow-hidden mb-3">
+          <div class="h-full bg-accent-500" style="width: 100%"></div>
+        </div>
+
+        <p class="text-xs text-ink-500 mt-3 leading-relaxed">
+          💡 위 항목을 클릭하면 오른쪽에 원문 인용이 펼쳐져요. 모든 평가는 이 출처에 기반해요.
+        </p>
+      </div>
+
+      <!-- 핵심 인용 -->
+      <div class="bg-white rounded-lg border border-paper-200 shadow-card p-5">
+        <div class="text-xs font-semibold text-ink-500 mb-2 tracking-wide">✨ 가장 인상적인 한마디</div>
+        <blockquote class="text-[15px] leading-relaxed text-ink-900 mb-3 relative pl-4 border-l-2 border-accent-500">
+          "비건이라고 다 무자극은 아니에요. pH 보다는 어떤 계면활성제를 썼는지가 자극도를 더 좌우해요."
+        </blockquote>
+        <div class="flex items-center gap-2 text-xs">
+          <div class="w-7 h-7 rounded-full bg-brand-100 text-brand-700 grid place-items-center font-semibold">A</div>
+          <div>
+            <div class="font-semibold text-ink-900">가상 전문가 A</div>
+            <div class="text-ink-500">성분 분석가 10년차 · 신뢰도 ⭐⭐⭐⭐ <span class="num">(8/10)</span></div>
+          </div>
+        </div>
+        <button class="mt-4 text-xs text-brand-600 font-semibold hover:underline">더 많은 인용 보기 →</button>
+      </div>
+
+      <!-- 💡 LLM 추천 -->
+      <div class="bg-white rounded-lg border border-paper-200 shadow-card p-5">
+        <div class="text-xs font-semibold text-accent-700 mb-3 tracking-wide">💡 그래서 이 제품, 당신에게?</div>
+
+        <div class="bg-brand-50/50 border border-brand-100 rounded-md p-3 mb-3">
+          <div class="text-sm font-bold text-brand-700 mb-1">✅ 추천해요</div>
+          <p class="text-sm text-ink-700 leading-relaxed">
+            민감성 피부 + 기초 메이크업 사용자에게 잘 맞아요.
+          </p>
+        </div>
+
+        <div class="bg-paper-50 border border-paper-200 rounded-md p-3 mb-4">
+          <div class="text-sm font-bold text-mute-600 mb-1">⚠️ 잠깐, 이런 분은?</div>
+          <ul class="text-sm text-ink-700 space-y-1 list-none">
+            <li>• 향에 예민하면 → 비추천</li>
+            <li>• 색조 메이크업 많이 하면 → 클렌징 오일을 같이 쓰세요</li>
+          </ul>
+        </div>
+
+        <p class="text-xs text-ink-500 leading-relaxed">
+          🤖 이 추천은 AI가 위 자료들을 종합한 결과예요.
+          자세한 근거는 위 <span class="font-semibold text-ink-700">📚 출처 카드</span>를 확인하세요.
+        </p>
+      </div>
+
+    </aside>
+  </section>
+
+  <!-- ──── 사용자 여정 미니맵 ──── -->
+  <section class="mt-5">
+    <div class="bg-white rounded-lg border border-paper-200 shadow-card p-5">
+      <div class="flex items-baseline justify-between mb-4">
+        <h2 class="text-base font-bold">🗺️ 사람들의 구매·사용 여정</h2>
+        <button class="text-xs text-brand-600 font-semibold hover:underline">자세히 보기 →</button>
+      </div>
+
+      <div class="grid grid-cols-4 gap-3 relative">
+        <!-- 연결 화살표 라인 (배경) -->
+        <div class="absolute top-8 left-[12%] right-[12%] h-px bg-paper-200 -z-0"></div>
+
+        <!-- Stage 1 -->
+        <div class="relative bg-paper-50 rounded-md p-4 border border-paper-200">
+          <div class="flex items-center gap-2 mb-2">
+            <span class="w-6 h-6 rounded-full bg-brand-600 text-white grid place-items-center text-xs font-bold">1</span>
+            <span class="text-xs font-semibold text-ink-700">처음 알게 됐을 때</span>
+          </div>
+          <p class="text-sm text-ink-900 leading-snug">성분부터 찾아봐요. 인증도 봐요.</p>
+          <div class="flex items-center justify-between mt-3 text-xs">
+            <span class="text-ink-500"><span class="num font-semibold text-ink-900">23명</span> 언급</span>
+            <span class="text-brand-600 num font-semibold">😊 88%</span>
+          </div>
+        </div>
+
+        <!-- Stage 2 -->
+        <div class="relative bg-paper-50 rounded-md p-4 border border-paper-200">
+          <div class="flex items-center gap-2 mb-2">
+            <span class="w-6 h-6 rounded-full bg-brand-600 text-white grid place-items-center text-xs font-bold">2</span>
+            <span class="text-xs font-semibold text-ink-700">살까말까 고민</span>
+          </div>
+          <p class="text-sm text-ink-900 leading-snug">"가성비 좋다는데?" 용량 비교.</p>
+          <div class="flex items-center justify-between mt-3 text-xs">
+            <span class="text-ink-500"><span class="num font-semibold text-ink-900">17명</span> 언급</span>
+            <span class="text-brand-600 num font-semibold">😊 71%</span>
+          </div>
+        </div>
+
+        <!-- Stage 3 -->
+        <div class="relative bg-paper-50 rounded-md p-4 border border-paper-200">
+          <div class="flex items-center gap-2 mb-2">
+            <span class="w-6 h-6 rounded-full bg-brand-600 text-white grid place-items-center text-xs font-bold">3</span>
+            <span class="text-xs font-semibold text-ink-700">직접 써본 후</span>
+          </div>
+          <p class="text-sm text-ink-900 leading-snug">"보습은 OK, 향이 좀..." 의견.</p>
+          <div class="flex items-center justify-between mt-3 text-xs">
+            <span class="text-ink-500"><span class="num font-semibold text-ink-900">41명</span> 언급</span>
+            <span class="text-mute-500 num font-semibold">😊 60%</span>
+          </div>
+        </div>
+
+        <!-- Stage 4 -->
+        <div class="relative bg-accent-50/40 rounded-md p-4 border border-accent-100">
+          <div class="flex items-center gap-2 mb-2">
+            <span class="w-6 h-6 rounded-full bg-accent-500 text-white grid place-items-center text-xs font-bold">4</span>
+            <span class="text-xs font-semibold text-accent-700">또 살까?</span>
+          </div>
+          <p class="text-sm text-ink-900 leading-snug">100명 중 <span class="num font-bold text-accent-700">52명</span>이 <span class="underline decoration-dotted decoration-accent-500" title="실제 구매 데이터가 아닌 리뷰에서 추출한 재구매 의도예요">다시 사고 싶대요</span> 👍</p>
+          <div class="flex items-center justify-between mt-3 text-xs">
+            <span class="text-ink-500"><span class="num font-semibold text-ink-900">11명</span> 언급</span>
+            <span class="text-brand-600 num font-semibold">😊 79%</span>
+          </div>
+          <div class="mt-2 text-[10px] text-mute-500 italic">* 의도 기반 추정 (실제 구매 데이터 아님)</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 푸터 메모 -->
+  <footer class="mt-6 text-xs text-ink-500 px-1 space-y-1">
+    <div>
+      <span class="font-semibold text-ink-700">📋 목업 안내</span> ·
+      모든 데이터는 가상(synthetic). 컬러 시스템: 인디고 #4F46E5 + 머스타드 옐로우 #F59E0B + 회색(부정) #6B7280 ·
+      폰트: Pretendard ·
+      <a class="text-brand-600 hover:underline" href="../prototype-plan.md">디자인 계획서 보기</a>
+    </div>
+    <div class="text-mute-500 text-[11px]">
+      <span class="font-semibold">🔍 Reality check 반영</span> ·
+      여정 4단계 분류·재구매 표기는 LLM zero-shot 추정 (정확도 ≈80%) ·
+      공개 리뷰 데이터는 AI Hub + 앱스토어 (쿠팡·네이버쇼핑 크롤링 X) ·
+      5축 hover 인용은 강·약 2축만 (MVP 비용 통제) ·
+      자세한 근거는 <a class="text-brand-600 hover:underline" href="../prd/dilab-mvp-prd.md">PRD 섹션 3.1</a>
+    </div>
+  </footer>
+
+</main>
+</body>
+</html>
