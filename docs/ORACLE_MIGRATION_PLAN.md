@@ -67,7 +67,10 @@
 - [x] `oracledb`(python-oracledb) 연결 PoC (thin 모드 + wallet mTLS) — `scripts/test_oracle_conn.py`. **검증됨 2026-06-23**: DB `Oracle AI Database 26ai 23.26.2.2.0`, `VECTOR_DISTANCE(...,COSINE)` 동작 확인.
   - ⚠️ pip 패키지명은 **`oracledb`** (문서 별칭 "python-oracledb" 아님). `import oracledb`.
   - 자격: `.env`(gitignore) — `ORACLE_USER/PASSWORD/DSN(dilab_high)/WALLET_DIR(secrets/wallet)/WALLET_PASSWORD`. Wallet zip·해제본은 `secrets/`(gitignore).
-- [ ] **(선택)** SQLcl MCP 등록 — 대화 중 직접 SQL 실행용 (개발 편의). Java 21 있음 + SQLcl 설치 필요.
+- [x] **SQLcl MCP 등록** — 대화 중 직접 SQL 실행용. SQLcl 26.1.2(brew cask) 설치, 저장 연결 `dilab_poc`(비번 포함), `.mcp.json`의 `oracle-sqlcl`(`sql -mcp`). MCP 서버 스모크 OK(도구: connect/sql_run/schema_information 등).
+  - wallet은 **ASCII 경로 `~/.dilab/wallet`** 로 이동(한글 프로젝트 경로를 SQLcl/JVM이 깨뜨려서). python `.env`도 이 경로 사용.
+  - SQLcl 비번에 `@` 포함 시 인라인 파싱 깨짐 → 따옴표(`user/"pwd"@dsn`)로 저장.
+  - ⚠️ Claude Code가 새 MCP를 인식하려면 **세션 리로드/재시작 + 신뢰 승인** 필요.
 
 ### Phase 1 — 벡터 레이어 PoC (다음 작업)
 - [ ] `chunks` 스키마를 Oracle DDL로 변환 (`VECTOR(1024, FLOAT32)` + HNSW cosine)

@@ -7,6 +7,11 @@
     "playwright": {
       "command": "npx",
       "args": ["-y", "@playwright/mcp@latest", "--browser", "chrome", "--headless"]
+    },
+    "oracle-sqlcl": {
+      "command": "/opt/homebrew/Caskroom/sqlcl/26.1.2.132.1334/sqlcl/bin/sql",
+      "args": ["-mcp"],
+      "env": { "LANG": "en_US.UTF-8", "LC_ALL": "en_US.UTF-8" }
     }
   }
 }
