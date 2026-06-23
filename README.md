@@ -1,5 +1,7 @@
 # DILAB (딜랩)
 
+> ⚠️ **이 저장소는 Oracle 전환 R&D용 *분리된 복제본*입니다** (AS_OF 2026-06-23). 운영 원본은 `github.com/YJlang/DILAB`(데모 `dilab.sean111400.workers.dev`, 실서비스 운영 중). 이 복제본은 git remote 없이 원본과 완전 분리돼 있으며, 벡터 레이어를 pgvector → **Oracle AI Vector Search(23ai)** 로 전환하는 작업을 진행합니다. → [`docs/ORACLE_MIGRATION_PLAN.md`](docs/ORACLE_MIGRATION_PLAN.md). 아래 운영 설명은 *원본 기준*입니다.
+
 > 임상순 교수님 연구실의 가칭 MVP 프로젝트. 싱클리(Syncly)를 벤치마킹하여, **전문가 리뷰 DB + 벡터 DB + RAG**로 *어디서 가져온 결론인지* 매번 보여주는 도메인 특화 제품 평가 서비스를 만들었습니다.
 
 ## 한눈에 보기

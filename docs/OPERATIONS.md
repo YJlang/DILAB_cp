@@ -1,5 +1,7 @@
 # DILAB 운영 가이드
 
+> ⚠️ **이 문서는 운영 *원본*(`github.com/YJlang/DILAB`) 기준입니다.** 현재 작업 트리는 Oracle 전환용 분리된 복제본 — **여기서 배포·운영 명령을 실행하지 말 것**(실서비스에 영향). 복제본 작업은 [ORACLE_MIGRATION_PLAN.md](ORACLE_MIGRATION_PLAN.md) 참고. (AS_OF 2026-06-23)
+>
 > **AS_OF**: 2026-05-28 (Phase 1·2·3 완료 후)
 > **데모 URL**: `https://dilab.sean111400.workers.dev` (24/7, 노트북 무관)
 > **이전 운영법** (Quick Tunnel + uvicorn) 은 §8 *Legacy* 섹션에 archive.

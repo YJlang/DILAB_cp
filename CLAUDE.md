@@ -2,6 +2,14 @@
 
 > 이 파일은 Claude Code가 자동으로 읽는 프로젝트 지침입니다. 팀 전체에 공통 적용됩니다.
 
+> ## ⚠️ 0. 이 저장소의 정체 — 분리된 Oracle 전환 복제본 (먼저 읽기)
+>
+> **이곳은 운영 repo가 아니라 Oracle 전환 R&D용 *분리된 복제본*입니다.** (AS_OF 2026-06-23)
+> - **운영 원본**(건드리지 말 것): `/Users/junha/Desktop/DILAB` · `github.com/YJlang/DILAB` · 데모 `dilab.sean111400.workers.dev` (실서비스 운영 중).
+> - **이 복제본**: git **remote 없음**(운영 repo와 완전 분리). 프로덕션 MCP(supabase·cloudflare)도 제거됨 → 남은 MCP는 `sentry`·`playwright`뿐.
+> - **목적**: 벡터 레이어를 **pgvector(Supabase) → Oracle AI Vector Search(23ai)** 로 전환하는 산학 과제. 상세 로드맵은 [`docs/ORACLE_MIGRATION_PLAN.md`](docs/ORACLE_MIGRATION_PLAN.md).
+> - **절대 금지**: 운영 원본 repo로 push, 운영 데모/프로덕션 백엔드(Supabase·Cloudflare) 변경. 이 복제본 작업이 실서비스에 영향을 주면 안 됨.
+
 ## 1. 프로젝트 정체성
 
 - **이름**: DILAB (딜랩) — 가칭 MVP 서비스
@@ -36,7 +44,7 @@ C:\dilab\
 ├── DESIGN.md                       ← 디자인 헌법 (Claude Code 자동 로드) — 디자인·UI 작업의 우선 규칙
 ├── README.md                       ← 팀원 온보딩
 ├── PLAN.MD                         ← 교수님과의 대화 원문 (수정 금지)
-├── .mcp.json                       ← MCP 4종 (supabase + cloudflare-bindings/builds/observability)
+├── .mcp.json                       ← MCP 2종 (sentry + playwright) — 프로덕션 MCP(supabase·cloudflare)는 복제본 분리 시 제거됨
 ├── .claude/skills/                 ← 디자인 리팩토링용 skill 3종 (designing-nextjs-ui, responsive-mobile-first, ui-ux-pro-max)
 ├── docs/
 │   ├── OPERATIONS.md               ← Cloudflare 배포·일상 운영 (PC 재기동 시 매일 루틴)
@@ -65,12 +73,13 @@ C:\dilab\
 | 5. MVP 풀스택 구현 (M2~M4) | **완료** (2026-05-27) — S1~S6 + 자동 분석 파이프라인 | `prototype/`, `ai-worker/` |
 | 6. Cloudflare 배포 운영 (M5) | **완료** (2026-05-28) — Workers + OpenNext + cloudflared Quick Tunnel | [`docs/OPERATIONS.md`](docs/OPERATIONS.md) |
 | 7. Cloudflare AI + Modal 하이브리드 (M6) | **완료** (2026-05-28) — BGE-M3 Workers AI + Modal 분석 큐. ai-worker 운영 폐기. 노트북 0시간, 월 $0. | [`docs/DEPLOYMENT_PLAN.md`](docs/DEPLOYMENT_PLAN.md), `modal_app/` |
-| 8. 데이터 확장 + 두 번째 도메인 | 다음 | (예정) |
+| 8. **Oracle AI Vector Search(23ai) 전환** | **진행 중** (2026-06~) — pgvector → Oracle 23ai. 이 복제본에서 수행. | [`docs/ORACLE_MIGRATION_PLAN.md`](docs/ORACLE_MIGRATION_PLAN.md) |
 
-### 운영 정보 (AS_OF 2026-05-28, M6 완료)
-- **데모 URL**: `https://dilab.sean111400.workers.dev` (24/7, **사용자 노트북 무관**)
+### 운영 정보 (AS_OF 2026-05-28, M6 완료) — *원본 repo 소유. 이 복제본은 R&D 전용이라 직접 운영하지 않음.*
+- **데모 URL**: `https://dilab.sean111400.workers.dev` (24/7, **운영 원본**이 배포·운영). 이 복제본에서 배포·변경하지 말 것.
 - **모든 기능 작동**: Ask·조회·분석·비교. ai-worker / cloudflared 운영 폐기.
-- **재기동·배포 절차**: [`docs/OPERATIONS.md`](docs/OPERATIONS.md), [`docs/DEPLOYMENT_PLAN.md`](docs/DEPLOYMENT_PLAN.md). 새 세션 시작 시 반드시 먼저 읽기.
+- **재기동·배포 절차**: [`docs/OPERATIONS.md`](docs/OPERATIONS.md), [`docs/DEPLOYMENT_PLAN.md`](docs/DEPLOYMENT_PLAN.md) — *운영 원본 기준 문서*.
+- **이 복제본에서 새 작업 시작 시**: [`docs/ORACLE_MIGRATION_PLAN.md`](docs/ORACLE_MIGRATION_PLAN.md)를 먼저 읽기.
 
 ## 5. Claude Code 협업 컨벤션
 

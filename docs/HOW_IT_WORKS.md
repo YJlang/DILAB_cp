@@ -1,5 +1,7 @@
 # DILAB — 내부 동작 + 남에게 설명하기 (초보자 가이드)
 
+> ⚠️ 현재 작업 트리는 **Oracle 전환용 분리된 복제본**(AS_OF 2026-06-23). 아래 설명의 **벡터 DB 레이어는 현재 pgvector(Supabase)** 기준이며, 이 복제본에서 **Oracle AI Vector Search(23ai)** 로 전환을 진행 중 → [ORACLE_MIGRATION_PLAN.md](ORACLE_MIGRATION_PLAN.md).
+>
 > *이 문서는 **두 청중** 을 위해 작성됨*:
 > 1. **초보자 본인** — DILAB 내부가 어떻게 돌아가는지 *비유로* 이해
 > 2. **외부 설명 시** — 교수님 / 협력사 대표 / 동기에게 *30초·3분·10분 버전* 으로 설명

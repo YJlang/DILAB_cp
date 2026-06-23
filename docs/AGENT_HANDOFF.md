@@ -1,6 +1,8 @@
 # Agent Handoff — DILAB MVP
 
 > 다른 환경 / 다른 세션의 **AI agent** (Claude Code 등) 가 즉시 이 프로젝트를 이어받을 수 있도록 작성한 인수인계 문서. **사람이 보기 좋게 작성하지 않았음** — agent 가 *최단 시간에 컨텍스트 복구* 하는 게 목적.
+>
+> ⚠️ **현재 작업 트리는 Oracle 전환용 *분리된 복제본***(AS_OF 2026-06-23). 운영 원본 `github.com/YJlang/DILAB`와 git/MCP 완전 분리. 아래 "저장소·데모·운영" 정보는 *원본 기준*이며, **이 복제본에서 원본 repo push·프로덕션 백엔드 변경 금지**. 이 복제본의 작업 목표·로드맵 → [ORACLE_MIGRATION_PLAN.md](ORACLE_MIGRATION_PLAN.md).
 
 - **AS_OF**: 2026-05-28 (Phase 1·2·3 완료)
 - **상태**: 풀스택 MVP + **Cloudflare + Modal + Supabase 하이브리드 24/7 운영**. ai-worker / cloudflared 운영 폐기, 노트북 0시간, 월 $0.
