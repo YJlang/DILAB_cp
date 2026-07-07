@@ -1,0 +1,321 @@
+<title>DILAB 아키텍처 전환 보고 — Oracle AI Database 26ai</title>
+<style>
+  :root {
+    --paper: #FBFAF9; --panel: #FFFFFF; --ink: #23201D; --ink-soft: #4A463F;
+    --muted: #857E73; --line: #E7E2DA; --line-soft: #F0ECE5;
+    --oracle: #BE3A2B; --oracle-soft: #FBEDEA; --oracle-ink: #8E2A1F;
+    --old: #6E7E8E; --old-soft: #EEF1F4; --old-ink: #4C5A69;
+    --good: #2E7D5B; --good-soft: #E7F3EC;
+    --shadow: 0 1px 2px rgba(35,32,29,.05), 0 8px 28px rgba(35,32,29,.05);
+    --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+    --sans: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Pretendard",
+            "Malgun Gothic", "Segoe UI", system-ui, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper: #17161A; --panel: #201E23; --ink: #ECE8E2; --ink-soft: #C4BEB5;
+      --muted: #928B80; --line: #322F36; --line-soft: #2A282E;
+      --oracle: #E5705F; --oracle-soft: #2E211E; --oracle-ink: #F0A497;
+      --old: #93A3B3; --old-soft: #21262C; --old-ink: #B7C4D0;
+      --good: #6FC79A; --good-soft: #1C2924;
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 10px 30px rgba(0,0,0,.35);
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper: #17161A; --panel: #201E23; --ink: #ECE8E2; --ink-soft: #C4BEB5;
+    --muted: #928B80; --line: #322F36; --line-soft: #2A282E;
+    --oracle: #E5705F; --oracle-soft: #2E211E; --oracle-ink: #F0A497;
+    --old: #93A3B3; --old-soft: #21262C; --old-ink: #B7C4D0;
+    --good: #6FC79A; --good-soft: #1B2823;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 10px 30px rgba(0,0,0,.35);
+  }
+  :root[data-theme="light"] {
+    --paper: #FBFAF9; --panel: #FFFFFF; --ink: #23201D; --ink-soft: #4A463F;
+    --muted: #857E73; --line: #E7E2DA; --line-soft: #F0ECE5;
+    --oracle: #BE3A2B; --oracle-soft: #FBEDEA; --oracle-ink: #8E2A1F;
+    --old: #6E7E8E; --old-soft: #EEF1F4; --old-ink: #4C5A69;
+    --good: #2E7D5B; --good-soft: #E7F3EC;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--paper); color: var(--ink);
+    font-family: var(--sans); line-height: 1.65;
+    -webkit-font-smoothing: antialiased; letter-spacing: -0.003em;
+  }
+  .wrap { max-width: 940px; margin: 0 auto; padding: 0 24px 96px; }
+  .col { max-width: 720px; }
+
+  /* header */
+  header.masthead { border-bottom: 1px solid var(--line); padding: 40px 0 30px; margin-bottom: 44px; }
+  .eyebrow {
+    font-family: var(--mono); font-size: 12px; letter-spacing: .09em; text-transform: uppercase;
+    color: var(--oracle); font-weight: 600; margin: 0 0 16px;
+  }
+  h1 {
+    font-size: clamp(28px, 4.6vw, 44px); line-height: 1.12; letter-spacing: -0.02em;
+    font-weight: 800; margin: 0 0 14px; text-wrap: balance;
+  }
+  h1 .arrow { color: var(--muted); font-weight: 500; }
+  h1 em { font-style: normal; color: var(--oracle); }
+  .lede { font-size: clamp(16px, 2vw, 18px); color: var(--ink-soft); margin: 0 0 22px; max-width: 640px; }
+  .meta { display: flex; flex-wrap: wrap; gap: 8px 18px; font-size: 13px; color: var(--muted); font-family: var(--mono); }
+  .meta b { color: var(--ink-soft); font-weight: 600; }
+
+  /* sections */
+  section { margin: 54px 0 0; }
+  .sec-eyebrow {
+    font-family: var(--mono); font-size: 12px; letter-spacing: .07em; text-transform: uppercase;
+    color: var(--muted); font-weight: 600; margin: 0 0 10px;
+  }
+  h2 { font-size: clamp(21px, 3vw, 27px); letter-spacing: -0.015em; font-weight: 750; margin: 0 0 14px; text-wrap: balance; }
+  h3 { font-size: 17px; font-weight: 700; margin: 22px 0 8px; }
+  p { margin: 0 0 14px; color: var(--ink-soft); }
+  p strong, li strong { color: var(--ink); font-weight: 650; }
+  a { color: var(--oracle); }
+
+  /* summary chips */
+  .chips { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px,1fr)); gap: 14px; margin: 8px 0 4px; }
+  .chip {
+    background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 18px 18px 16px;
+    box-shadow: var(--shadow);
+  }
+  .chip .k { font-family: var(--mono); font-size: 11.5px; letter-spacing: .05em; text-transform: uppercase; color: var(--muted); margin: 0 0 8px; }
+  .chip .v { font-size: 15px; font-weight: 650; color: var(--ink); line-height: 1.45; }
+  .chip .v .hi { color: var(--oracle); }
+
+  /* architecture diagram */
+  .canvas {
+    background: var(--panel); border: 1px solid var(--line); border-radius: 16px;
+    padding: 26px 22px; margin: 18px 0 6px; box-shadow: var(--shadow); overflow-x: auto;
+  }
+  .canvas-cap { font-family: var(--mono); font-size: 12px; color: var(--muted); text-align: center; margin: 14px 0 0; letter-spacing: .02em; }
+  .stack { display: flex; flex-direction: column; align-items: center; gap: 0; min-width: 460px; }
+  .layer { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; width: 100%; }
+  .node {
+    border: 1.5px solid var(--line); border-radius: 12px; background: var(--paper);
+    padding: 12px 16px; min-width: 150px; text-align: center;
+  }
+  .node .lbl { font-family: var(--mono); font-size: 10.5px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin: 0 0 3px; }
+  .node .name { font-size: 14px; font-weight: 700; color: var(--ink); }
+  .node .sub { font-size: 12px; color: var(--ink-soft); margin-top: 3px; line-height: 1.4; }
+  .node.oracle { border-color: var(--oracle); background: var(--oracle-soft); }
+  .node.oracle .lbl { color: var(--oracle); }
+  .node.old { border-color: var(--old); background: var(--old-soft); }
+  .node.old .lbl { color: var(--old-ink); }
+  .node.llm { border-style: dashed; }
+  .node.big { min-width: 260px; padding: 16px 20px; }
+  .arrowv { width: 2px; height: 26px; background: var(--line); position: relative; }
+  .arrowv::after {
+    content: ""; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+    border: 5px solid transparent; border-top-color: var(--line); border-bottom: 0;
+  }
+  .arrowv.o { background: var(--oracle); }
+  .arrowv.o::after { border-top-color: var(--oracle); }
+  .edge-note { font-family: var(--mono); font-size: 11px; color: var(--muted); padding: 3px 0; }
+
+  /* horizontal flow (RAG) */
+  .flow { display: flex; align-items: stretch; gap: 0; min-width: 540px; }
+  .flow .step {
+    flex: 1; border: 1.5px solid var(--line); border-radius: 12px; background: var(--paper);
+    padding: 12px 12px; text-align: center; display: flex; flex-direction: column; justify-content: center;
+  }
+  .flow .step.oracle { border-color: var(--oracle); background: var(--oracle-soft); }
+  .flow .step .n { font-size: 13.5px; font-weight: 700; }
+  .flow .step .c { font-family: var(--mono); font-size: 10.5px; color: var(--muted); margin-top: 4px; }
+  .flow .caret { align-self: center; color: var(--muted); font-weight: 700; padding: 0 8px; font-size: 18px; }
+
+  .legend { display: flex; gap: 18px; flex-wrap: wrap; justify-content: center; margin: 18px 0 0; font-size: 12px; color: var(--muted); }
+  .legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .swatch { width: 12px; height: 12px; border-radius: 3px; border: 1.5px solid; }
+  .swatch.o { background: var(--oracle-soft); border-color: var(--oracle); }
+  .swatch.d { background: var(--old-soft); border-color: var(--old); }
+
+  /* comparison table */
+  .tablewrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 14px; margin: 16px 0 6px; box-shadow: var(--shadow); }
+  table { border-collapse: collapse; width: 100%; min-width: 560px; font-size: 14px; background: var(--panel); }
+  th, td { text-align: left; padding: 12px 16px; border-bottom: 1px solid var(--line-soft); }
+  thead th { font-family: var(--mono); font-size: 11.5px; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); font-weight: 600; background: var(--paper); }
+  tbody tr:last-child td { border-bottom: 0; }
+  td.old { color: var(--old-ink); }
+  td.new { color: var(--oracle-ink); font-weight: 600; }
+  .row-h { font-weight: 650; color: var(--ink); }
+
+  /* callout */
+  .callout {
+    border-left: 3px solid var(--oracle); background: var(--oracle-soft);
+    padding: 16px 20px; border-radius: 0 12px 12px 0; margin: 18px 0; color: var(--ink);
+  }
+  .callout .t { font-weight: 700; margin-bottom: 4px; }
+
+  /* status list */
+  ul.status { list-style: none; padding: 0; margin: 8px 0; display: grid; gap: 8px; }
+  ul.status li { display: flex; gap: 12px; align-items: flex-start; font-size: 14.5px; color: var(--ink-soft); }
+  ul.status li .mk { flex: none; width: 20px; height: 20px; border-radius: 6px; display: grid; place-items: center; font-size: 12px; font-weight: 700; margin-top: 1px; }
+  ul.status li .mk.ok { background: var(--good-soft); color: var(--good); }
+  ul.status li .mk.next { background: var(--old-soft); color: var(--old-ink); }
+  ul.status li b { color: var(--ink); }
+
+  ul.plain { padding-left: 18px; margin: 8px 0 14px; }
+  ul.plain li { margin: 6px 0; color: var(--ink-soft); }
+  ul.plain li strong { color: var(--ink); }
+
+  footer { margin-top: 60px; padding-top: 22px; border-top: 1px solid var(--line); font-size: 12.5px; color: var(--muted); font-family: var(--mono); }
+  code { font-family: var(--mono); font-size: .9em; background: var(--line-soft); padding: 1px 6px; border-radius: 5px; color: var(--oracle-ink); }
+  @media (prefers-color-scheme: dark) { code { color: var(--oracle); } }
+  :root[data-theme="dark"] code { color: var(--oracle); }
+</style>
+
+<div class="wrap">
+
+  <header class="masthead">
+    <p class="eyebrow">INC Lab × 딥인사이트랩 · 아키텍처 전환 진행 보고</p>
+    <h1>DILAB 벡터 인프라 전환<br><span class="arrow">pgvector · Modal →</span> <em>Oracle AI Database 26ai</em></h1>
+    <p class="lede">오픈소스 pgvector(Supabase) + Modal 서버리스 구조를, 저장·임베딩·검색을 하나로 통합하는 <strong>Oracle AI Database 26ai</strong> 로 전환했습니다. 임베딩과 벡터 검색이 <strong>데이터베이스 안(in-DB)</strong> 에서 수행됩니다.</p>
+    <div class="meta">
+      <span><b>기준일</b> 2026-07-07</span>
+      <span><b>단계</b> 단일 테넌트 전환 완료 · 기능 실증</span>
+      <span><b>배경</b> 수요기업 보안·검증 요구 (교수님 제안)</span>
+    </div>
+  </header>
+
+  <div class="col">
+
+  <section aria-label="요약">
+    <p class="sec-eyebrow">한눈에</p>
+    <h2>무엇이 바뀌었나</h2>
+    <div class="chips">
+      <div class="chip"><p class="k">저장 · 검색</p><p class="v">Supabase pgvector → <span class="hi">Oracle 26ai</span> 벡터 검색으로 이관</p></div>
+      <div class="chip"><p class="k">임베딩</p><p class="v">외부 임베더 제거 → <span class="hi">DB 내부(in-DB) 임베딩</span> (ONNX)</p></div>
+      <div class="chip"><p class="k">컨버지드</p><p class="v">관계형 · JSON · <span class="hi">벡터</span>를 한 DB에서 (한 SQL로 결합)</p></div>
+      <div class="chip"><p class="k">기능</p><p class="v">브라우징 · 질의응답 · 리포트 · <span class="hi">제품 자동 분석</span> 전부 동작</p></div>
+    </div>
+  </section>
+
+  <section aria-label="배경">
+    <p class="sec-eyebrow">배경</p>
+    <h2>왜 Oracle 26ai 인가</h2>
+    <p>수요기업(한국콜마·테팔 등)은 주요 데이터를 저장하는 공간이 <strong>보안성이 높고 검증된 솔루션</strong>이기를 원합니다. 성능의 문제가 아니라 <strong>신뢰와 거버넌스</strong>의 문제입니다.</p>
+    <p>기존 DILAB은 오픈소스 <strong>pgvector</strong>(PostgreSQL 확장)로 RAG를 구성했습니다. 이를 엔터프라이즈 보안·감사·거버넌스가 검증된 <strong>Oracle AI Database 26ai</strong> 의 벡터 검색 기능으로 대체해, 같은 서비스를 <em>더 신뢰받는 기반</em> 위에서 제공하는 것이 이번 전환의 목표입니다.</p>
+    <div class="callout">
+      <div class="t">핵심 관점</div>
+      "데이터를 AI로 보내는 것"이 아니라 <strong>"AI를 데이터가 있는 곳으로 가져오는 것"</strong>. 임베딩·검색을 외부로 빼지 않고 데이터베이스 안에서 처리 → 데이터가 검증된 DB를 떠나지 않습니다.
+    </div>
+  </section>
+
+  <section aria-label="기존 아키텍처">
+    <p class="sec-eyebrow">Before</p>
+    <h2>기존 아키텍처 — pgvector + Modal</h2>
+    <p>저장은 <strong>Supabase</strong>(Postgres+pgvector), 무거운 계산(크롤링·임베딩·토픽·LLM 라벨)은 클라우드 서버리스 <strong>Modal</strong>, 질문 임베딩은 <strong>Cloudflare Workers AI</strong> — 역할이 여러 외부 서비스로 흩어져 있었습니다.</p>
+    <div class="canvas">
+      <div class="stack">
+        <div class="node"><div class="lbl">Client</div><div class="name">사용자 브라우저</div></div>
+        <div class="arrowv"></div>
+        <div class="node big"><div class="lbl">Frontend · Edge</div><div class="name">Next.js @ Cloudflare Workers</div></div>
+        <div class="arrowv"></div>
+        <div class="layer">
+          <div class="node old"><div class="lbl">저장 + 벡터검색</div><div class="name">Supabase</div><div class="sub">Postgres + pgvector<br>match_chunks (코사인)</div></div>
+          <div class="node old"><div class="lbl">계산 (서버리스)</div><div class="name">Modal 워커</div><div class="sub">크롤 · BGE-M3 임베딩<br>BERTopic · LLM 라벨</div></div>
+          <div class="node llm"><div class="lbl">임베딩</div><div class="name">CF Workers AI</div><div class="sub">BGE-M3 (질문)</div></div>
+        </div>
+      </div>
+      <p class="canvas-cap">저장(Supabase) · 계산(Modal) · 임베딩(CF)이 서로 다른 3개 외부 서비스로 분산</p>
+    </div>
+  </section>
+
+  <section aria-label="전환 후 아키텍처">
+    <p class="sec-eyebrow">After</p>
+    <h2>전환 후 아키텍처 — Oracle 26ai 중심</h2>
+    <p><strong>저장 · 임베딩 · 벡터 검색을 Oracle 26ai 하나</strong>가 담당합니다. 애플리케이션은 로컬에서 DB에 직접 연결하고, 답변 생성(LLM)만 외부(DeepSeek)에 위임합니다. 흩어져 있던 벡터 파이프라인이 <strong>DB 한 곳으로 수렴</strong>했습니다.</p>
+    <div class="canvas">
+      <div class="stack">
+        <div class="node"><div class="lbl">Client</div><div class="name">사용자 브라우저</div></div>
+        <div class="arrowv"></div>
+        <div class="layer">
+          <div class="node"><div class="lbl">Frontend</div><div class="name">Next.js (로컬)</div><div class="sub">node-oracledb</div></div>
+          <div class="node"><div class="lbl">Ingest 워커</div><div class="name">로컬 파이프라인</div><div class="sub">네이버 크롤 · 라벨</div></div>
+        </div>
+        <div class="arrowv o"></div>
+        <div class="node oracle big"><div class="lbl">Converged Database</div><div class="name">Oracle AI Database 26ai</div><div class="sub">저장 · <b>in-DB 임베딩(VECTOR_EMBEDDING)</b> · 벡터검색(VECTOR_DISTANCE)</div></div>
+        <div class="arrowv"></div>
+        <div class="node llm"><div class="lbl">생성만 외부</div><div class="name">DeepSeek</div><div class="sub">답변 합성 (LLM)</div></div>
+      </div>
+      <div class="legend">
+        <span><span class="swatch o"></span> Oracle 26ai (저장·임베딩·검색)</span>
+        <span><span class="swatch d"></span> 이전 외부 서비스 (제거됨)</span>
+      </div>
+      <p class="canvas-cap">Cloudflare AI · Modal(임베딩) · pgvector 제거 → 벡터 파이프라인이 Oracle로 완결</p>
+    </div>
+  </section>
+
+  <section aria-label="Oracle in-DB 기능">
+    <p class="sec-eyebrow">Oracle AI Database 26ai · 핵심 기능</p>
+    <h2>임베딩과 검색이 DB 안에서 돈다</h2>
+    <p>Oracle 26ai는 별도의 벡터 전용 DB가 아니라, <strong>관계형 데이터베이스에 벡터 기능이 내장</strong>된 컨버지드 DB입니다. DILAB이 활용하는 세 가지:</p>
+
+    <h3>① 컨버지드 — 한 DB, 한 SQL</h3>
+    <p>제품·리뷰·평점 같은 <strong>관계형 데이터</strong>와 리뷰 임베딩 <strong>벡터</strong>가 같은 DB에 있어, "벡터 유사도 + 도메인/제품/출처 필터 + 전문가 우선"을 <strong>한 번의 SQL</strong>로 처리합니다. 데이터를 밖으로 옮길 필요가 없습니다.</p>
+
+    <h3>② in-DB 임베딩 — 외부 임베더 불필요</h3>
+    <p>다국어 임베딩 모델(ONNX)을 DB에 적재해, <strong>텍스트를 넣으면 DB가 직접 벡터로 변환</strong>합니다. 별도의 임베딩 서버(과거 BGE-M3/Cloudflare)가 필요 없습니다.</p>
+
+    <h3>③ 벡터 검색 — VECTOR_DISTANCE</h3>
+    <p>코사인 거리로 의미가 가까운 근거를 찾고, HNSW 인덱스로 가속합니다. 질문 임베딩부터 근거 검색까지 <strong>전 과정이 DB 내부</strong>에서 이뤄집니다.</p>
+
+    <div class="canvas">
+      <div class="flow">
+        <div class="step"><div class="n">질문 텍스트</div><div class="c">"진정 효과 좋은 제품?"</div></div>
+        <div class="caret">›</div>
+        <div class="step oracle"><div class="n">in-DB 임베딩</div><div class="c">VECTOR_EMBEDDING</div></div>
+        <div class="caret">›</div>
+        <div class="step oracle"><div class="n">벡터 검색</div><div class="c">VECTOR_DISTANCE · 코사인</div></div>
+        <div class="caret">›</div>
+        <div class="step"><div class="n">근거 청크</div><div class="c">전문가 우선</div></div>
+        <div class="caret">›</div>
+        <div class="step"><div class="n">답변 생성</div><div class="c">DeepSeek</div></div>
+      </div>
+      <p class="canvas-cap">RAG 질의응답 흐름 — 가운데 두 단계(임베딩·검색)가 모두 Oracle 26ai 내부에서 수행</p>
+    </div>
+  </section>
+
+  <section aria-label="무엇이 어디서 도나">
+    <p class="sec-eyebrow">비교</p>
+    <h2>무엇이 어디서 도나</h2>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>구성</th><th>기존 (Supabase + Modal)</th><th>전환 후 (Oracle 26ai)</th></tr></thead>
+        <tbody>
+          <tr><td class="row-h">저장</td><td class="old">Supabase Postgres</td><td class="new">Oracle 26ai</td></tr>
+          <tr><td class="row-h">벡터 검색</td><td class="old">pgvector · match_chunks</td><td class="new">VECTOR_DISTANCE (in-DB)</td></tr>
+          <tr><td class="row-h">임베딩</td><td class="old">BGE-M3 · Cloudflare / Modal</td><td class="new">in-DB ONNX (DB가 직접)</td></tr>
+          <tr><td class="row-h">분석 계산</td><td class="old">Modal 서버리스</td><td class="new">로컬 워커 → Oracle 적재</td></tr>
+          <tr><td class="row-h">답변 생성(LLM)</td><td class="old">DeepSeek</td><td class="new">DeepSeek (동일)</td></tr>
+          <tr><td class="row-h">보안·거버넌스</td><td class="old">오픈소스 수준</td><td class="new">엔터프라이즈(암호화·VPD·감사)</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="margin-top:14px">임베딩·토픽·LLM 같은 <strong>계산 로직과 화면은 그대로 유지</strong>하고, "벡터를 어디에 저장·검색하느냐"만 Oracle로 바뀌었습니다. 답변 생성(DeepSeek)만 외부에 남습니다.</p>
+  </section>
+
+  <section aria-label="달성 현황">
+    <p class="sec-eyebrow">현황</p>
+    <h2>Oracle 위에서 실제 동작하는 기능</h2>
+    <ul class="status">
+      <li><span class="mk ok">✓</span><span><b>제품 브라우징 · 대시보드 · 5축 평가 리포트</b> — Oracle에서 읽어 렌더</span></li>
+      <li><span class="mk ok">✓</span><span><b>자연어 질의응답(Ask)</b> — 질문을 Oracle이 in-DB 임베딩 → 벡터 검색 → 근거 인용 답변</span></li>
+      <li><span class="mk ok">✓</span><span><b>PDF 리포트 생성</b> — Oracle 데이터를 인쇄</span></li>
+      <li><span class="mk ok">✓</span><span><b>제품명 자동 분석</b> — 제품명 입력 → 네이버 크롤 → 분석 → Oracle 적재 → 화면 반영</span></li>
+      <li><span class="mk next">→</span><span><b>남은 과제</b> — 경쟁 비교(LLM) 로컬 포팅, 멀티테넌트 접근제어(Oracle VPD)</span></li>
+    </ul>
+    <div class="callout">
+      <div class="t">근거기반 신뢰성 강화</div>
+      평가 점수 산정에 <strong>전문가 리뷰 가중치</strong>와 <strong>표본 수 보정</strong>을 도입해, 근거가 얕은 항목이 과신되지 않도록 했습니다. "어디서 나온 결론인지" 추적 가능한 DILAB의 차별점을 Oracle 위에서도 유지·강화합니다.
+    </div>
+  </section>
+
+  <footer>
+    DILAB · Oracle AI Database 26ai 전환 진행 보고 · AS_OF 2026-07-07 · 단일 테넌트 범위 · 그림의 수치는 시제품 데이터 기반 예시
+  </footer>
+
+  </div>
+</div>
