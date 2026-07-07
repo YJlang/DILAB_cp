@@ -13,7 +13,6 @@ from typing import Any, cast
 from ..analysis import label_domain
 from ..config import settings
 from ..db import supabase
-from ..embeddings import embed_texts
 from ..ratings import upsert_ratings
 from .naver_fetcher import NaverClient
 from .slug import build_slug
@@ -152,14 +151,8 @@ def analyze_product(
     inserted_docs: list[Row] = []
     if doc_payloads:
         inserted_docs = _rows(supabase.table("documents").insert(doc_payloads).execute())
-        texts = [d["body"] for d in doc_payloads]
-        vectors = embed_texts(texts)
-        # [리뷰] ★ 중요한 비대칭: 여기 네이버 경로는 chunk_markdown 을 쓰지 않고
-        #        문서 본문 전체를 "1청크"로 넣음(chunk_index=0, token_count=글자수).
-        #        반면 seed 경로(pipeline.py)는 헤딩·500자로 잘게 쪼갬.
-        #        본문이 짧은 네이버 description 이라 1청크가 합리적이지만, 두 경로의 청킹이
-        #        다르다는 점은 검색·점수 일관성 리뷰 시 짚어야 할 부분.
-        # [리뷰] strict=True → 문서/임베딩 개수가 어긋나면 즉시 에러. 조용한 짝 밀림 버그를 막음.
+        # [Oracle 전환] 네이버 경로는 문서 본문 전체를 "1청크"로 넣음(chunk_index=0,
+        #        token_count=글자수). embedding 은 여기서 넣지 않고(NULL) 아래 in-DB 임베딩으로 채움.
         supabase.table("chunks").insert(
             [
                 {
@@ -168,11 +161,27 @@ def analyze_product(
                     "chunk_index": 0,
                     "text": doc["body"],
                     "token_count": len(doc["body"]),
-                    "embedding": vec,
                 }
-                for row, doc, vec in zip(inserted_docs, doc_payloads, vectors, strict=True)
+                for row, doc in zip(inserted_docs, doc_payloads, strict=True)
             ]
         ).execute()
+
+        # [Oracle 전환] 검색 read-layer(oracle_retrieve)가 chunks.product_id/source_type/author
+        #        로 필터하므로 documents 에서 denormalize (새 청크만 — product_id IS NULL).
+        supabase.run_sql(
+            "UPDATE chunks c SET (product_id, source_type, author, author_credibility) = "
+            "(SELECT d.product_id, d.source_type, d.author, d.author_credibility "
+            " FROM documents d WHERE d.id = c.document_id) "
+            "WHERE c.domain_id = :d AND c.product_id IS NULL AND c.document_id IS NOT NULL",
+            {"d": domain_id},
+        )
+        # [Oracle 전환] in-DB 임베딩 — sentence-transformers/torch 불필요. DILAB_E5(384dim).
+        supabase.run_sql(
+            "UPDATE chunks SET embedding = "
+            "VECTOR_EMBEDDING(DILAB_E5 USING 'passage: ' || TO_CHAR(text) AS data) "
+            "WHERE embedding IS NULL AND domain_id = :d",
+            {"d": domain_id},
+        )
 
     # 4. 라벨링 (도메인 전체 — 이미 라벨된 chunk 는 skip 됨)
     # [리뷰] 방금 넣은 청크만이 아니라 "도메인 전체"를 대상으로 라벨링을 호출.

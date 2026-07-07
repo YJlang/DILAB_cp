@@ -22,17 +22,19 @@
 ────────────────────────────────────────────────────────────────────────
 """
 from functools import lru_cache
-
-from sentence_transformers import SentenceTransformer
+from typing import Any
 
 from ..config import settings
 
+# [Oracle 전환] sentence_transformers 는 지연 import — 임베딩은 Oracle in-DB(VECTOR_EMBEDDING)로
+# 이관돼 이 경로는 안 쓰인다. 패키지 import 만으로 torch 를 끌어오지 않도록 함수 안에서 import.
+
 
 @lru_cache(maxsize=1)
-def get_model() -> SentenceTransformer:
-    """프로세스당 1회만 로드 (가중치 ~수 GB)."""
-    # [리뷰] @lru_cache 가 없으면 호출마다 수 GB 모델을 재로딩 → 사실상 동작 불능.
-    #        "모델은 1번만 로드" 원칙(README)을 강제하는 한 줄.
+def get_model() -> Any:
+    """프로세스당 1회만 로드 (가중치 ~수 GB). (레거시 — 현재 파이프라인 미사용)"""
+    from sentence_transformers import SentenceTransformer
+
     return SentenceTransformer(settings.embedding_model_name)
 
 
