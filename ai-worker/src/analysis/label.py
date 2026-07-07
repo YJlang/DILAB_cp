@@ -26,12 +26,12 @@ LABEL_CONCURRENCY = 8
 
 
 SYSTEM_PROMPT = """\
-당신은 화장품 도메인 텍스트 라벨러입니다.
-청크 텍스트를 읽고 다음 세 가지를 라벨링하세요:
+당신은 화장품 도메인 리뷰를 **정밀하게 라벨링하는 분석기**입니다. 소비자·전문가 리뷰 한 청크를 읽고, 텍스트에 담긴 근거에 충실하게 세 가지를 판정합니다. 뒤에서 이 라벨로 제품의 5축 점수가 매겨지므로 **정확도가 곧 신뢰도**입니다.
 
-1. categories: 도메인 정의 카테고리 중 텍스트가 다루는 것을 0~3개 선택 (해당 없으면 빈 배열)
-2. sentiment: positive | neutral | negative 중 하나 + intensity 0~1
-3. journey: 사용자 여정 단계 중 가장 잘 맞는 1개
+판정 항목:
+1. categories: 이 청크가 *실제로 다루는* 도메인 카테고리를 0~3개. 텍스트에 근거가 뚜렷한 것만(스치듯 언급은 제외). 각 category에 confidence(그 축을 다룬다는 확신).
+2. sentiment: 청크 전체 톤을 positive|neutral|negative 하나 + intensity(감정 세기 0~1).
+3. journey: 소비자 구매 여정 단계 중 가장 잘 맞는 1개.
 
 반드시 다음 JSON 만 출력 (다른 텍스트·코드블록 X):
 {
@@ -40,11 +40,12 @@ SYSTEM_PROMPT = """\
   "journey": {"stage_key": "<도메인 stage key>", "confidence": 0.0-1.0}
 }
 
-규칙:
-- categories 의 category 는 도메인 정의 카테고리 문자열 그대로.
-- 짧은 텍스트(<50자)나 모호하면 confidence 낮춰 (0.5 미만은 빈 배열 권장).
-- sentiment 는 텍스트 톤 전체. 단순 사실 서술은 neutral.
-- journey stage_key 는 도메인 정의 key 중 하나 그대로.
+정확도 규칙:
+- **근거 없으면 넣지 마세요** — 카테고리는 텍스트가 명확히 다룰 때만. 애매하면 confidence를 낮추고 0.5 미만이면 제외(빈 배열 OK).
+- category·stage_key 는 **도메인 정의 문자열을 글자 그대로**. 새로 만들지 마세요.
+- sentiment 는 톤 전체를 반영. 단순 사실·성분 나열은 neutral, 칭찬/불만이 뚜렷하면 intensity를 높게.
+- **광고·홍보성 문구는 신중히** — 과장된 긍정을 그대로 믿지 말고 근거의 실제 강도로 판정.
+- 짧거나(<50자) 모호한 텍스트는 전반적으로 confidence를 낮춥니다.
 """
 
 
@@ -99,7 +100,7 @@ def label_chunk(chunk_id: str, text: str, domain_meta: dict[str, Any]) -> ChunkL
             {"role": "user", "content": user_prompt},
         ],
         temperature=0.0,
-        max_tokens=300,
+        max_tokens=2500,  # 추론모델은 reasoning 이 토큰을 소모 → 작으면 content 가 비어 라벨이 조용히 깨짐
     )
     obj = _parse_json(raw)
     cats = obj.get("categories", []) or []

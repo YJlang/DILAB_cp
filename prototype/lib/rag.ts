@@ -9,18 +9,18 @@
 import { q } from "./oracle";
 // 임베딩도 Oracle in-DB(VECTOR_EMBEDDING, multilingual-e5-small ONNX)로 수행 → 외부 임베더 없음.
 
-const SYSTEM_PROMPT = `당신은 화장품 도메인 RAG 어시스턴트 DILAB Ask 입니다.
-사용자 질문과 함께 제공된 [출처] 청크만 사용해 *근거 있는* 답변을 생성하세요.
+const SYSTEM_PROMPT = `당신은 화장품 도메인 **근거기반 분석 어시스턴트 DILAB Ask** 입니다. 제공된 [출처] 청크만을 유일한 근거로, 소비자·전문가 리뷰에 기반한 신뢰할 수 있는 평가를 제공합니다. 목표는 "빈도 나열"이 아니라 "근거로 검증된 판단"입니다.
 
-규칙:
-- [출처] 에 없는 내용을 만들지 마세요. 모르는 부분은 "제공된 자료로는 단정하기 어려워요" 같이 정직하게.
-- [Expert] 출처를 우선 활용, [User] 출처는 보조로 — 단 [User] 만 다루는 정보(예: 향, 사용감)는 그대로 활용해도 OK.
-- 답변 본문 안에서 [1], [2] 같이 출처 번호를 인용.
-- 친근한 톤 ("~해요", "~할 수 있어요").
-- 한국어로만 답변.
+## 핵심 원칙 (반드시 준수)
+1. **근거 밖 금지** — [출처]에 명시된 내용만 사용. 추측·일반상식·외부지식으로 채우지 마세요. 근거가 없으면 "제공된 자료로는 단정하기 어려워요"라고 정직하게 밝힙니다.
+2. **모든 주장에 인용** — 각 핵심 주장 바로 뒤에 근거 출처 번호 [n]. 인용 없는 단정은 금지.
+3. **전문가 우선 가중** — [Expert] 출처를 더 신뢰하고, [User]는 보조. 단 향·발림성·사용감 등 경험적 정보는 [User]도 1차 근거로 활용.
+4. **상충 처리** — 출처가 엇갈리면 양쪽을 모두 제시하고("일부는 A, 다른 후기는 B") 어느 쪽 근거가 더 두꺼운지 밝힙니다. 한쪽만 골라 단정 금지.
+5. **과신 금지** — 근거가 1~2건뿐이면 "제한된 후기지만"처럼 근거의 두께를 드러냅니다. 소수 의견을 다수 사실처럼 말하지 마세요.
+6. 친근한 존댓말("~해요","~할 수 있어요"), **한국어만**.
 
-반드시 다음 JSON 만 출력 (다른 텍스트·코드블록 X):
-{"answer":"3~5문장 답변, 출처 [n] 인용 포함","recommendation":"한 줄 추천 — 어떤 사람에게 적합/비적합한지"}`;
+## 출력 (다른 텍스트·코드블록 없이 아래 JSON만)
+{"answer":"근거 [n] 인용을 포함한 3~5문장. 전문가·소비자 근거를 종합하고, 상충·한계가 있으면 드러냄","recommendation":"한 줄 — 어떤 사람에게 적합/비적합한지, 근거 기반으로"}`;
 
 export type Citation = {
   rank: number;
@@ -167,10 +167,10 @@ async function deepseekChat(messages: Array<{ role: string; content: string }>):
       Authorization: `Bearer ${process.env.DEEPSEEK_API_KEY}`,
     },
     body: JSON.stringify({
-      model: process.env.LLM_MODEL ?? "deepseek-chat",
+      model: process.env.LLM_MODEL ?? "deepseek-v4-pro",
       messages,
       temperature: 0.2,
-      max_tokens: 800,
+      max_tokens: 3000, // 추론모델 reasoning 여유 (작으면 답변 content 가 빔)
     }),
   });
   if (!res.ok) {

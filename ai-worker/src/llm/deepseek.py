@@ -23,7 +23,7 @@ def chat(
     *,
     model: str | None = None,
     temperature: float = 0.2,
-    max_tokens: int = 1024,
+    max_tokens: int = 3000,  # 추론모델(v4-pro)은 reasoning 토큰을 먹으므로 여유 확보
 ) -> str:
     """채팅 보완 호출. messages 는 OpenAI 형식 [{"role":"system|user|assistant","content":"..."}]."""
     client = get_client()
