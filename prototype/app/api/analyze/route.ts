@@ -27,6 +27,19 @@ export async function POST(req: Request) {
     }
     const domainSlug = body.domain_slug ?? "cosmetics";
 
+    // [Oracle 전환 복제본] 신규 제품 분석은 Modal 인제스트 파이프라인(크롤링→ML→적재) +
+    // Supabase write 경로라 이 로컬 Oracle 데모에선 비활성화. 기존 제품은 브라우징·Ask 가능.
+    if (!process.env.SUPABASE_URL || !process.env.MODAL_TRIGGER_URL) {
+      return NextResponse.json(
+        {
+          error:
+            "신규 제품 분석은 Modal 인제스트 파이프라인(리뷰 크롤링·임베딩·토픽·평점 생성)이 필요해, " +
+            "이 로컬 Oracle 데모에선 비활성화돼 있어요. 이미 분석된 제품은 대시보드·제품·Ask 에서 보실 수 있습니다.",
+        },
+        { status: 501 },
+      );
+    }
+
     const { data, error } = await supabase
       .from("analysis_jobs")
       .insert({
