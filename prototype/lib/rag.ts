@@ -7,7 +7,7 @@
  * ⚠️ 로컬 dev 전용(node-oracledb). 시그니처·반환 타입은 원본과 동일 → UI 변경 없음.
  */
 import { q } from "./oracle";
-import { embedQuery } from "./embeddings";
+// 임베딩도 Oracle in-DB(VECTOR_EMBEDDING, multilingual-e5-small ONNX)로 수행 → 외부 임베더 없음.
 
 const SYSTEM_PROMPT = `당신은 화장품 도메인 RAG 어시스턴트 DILAB Ask 입니다.
 사용자 질문과 함께 제공된 [출처] 청크만 사용해 *근거 있는* 답변을 생성하세요.
@@ -78,28 +78,27 @@ async function resolveProductId(domainId: string, productSlug: string): Promise<
   throw new Error(`product slug not found: ${productSlug}`);
 }
 
+// 질문을 Oracle 안에서 임베딩(e5, 'query: ' 프리픽스)하고 바로 VECTOR_DISTANCE.
+// TO_VECTOR/외부 임베더 없이 텍스트만 넘기면 DB가 임베딩까지 처리.
+const QEMB = "VECTOR_EMBEDDING(DILAB_E5 USING 'query: ' || :qtext AS data)";
+
 async function retrieve(
-  qv: number[],
+  qtext: string,
   domainId: string,
   productId: string | null,
   sourceType: "expert" | "public_review",
   k: number,
 ): Promise<MatchedChunk[]> {
   const productFilter = productId ? "AND product_id = :pid" : "";
-  const binds: Record<string, unknown> = {
-    qv: JSON.stringify(qv),
-    domain: domainId,
-    st: sourceType,
-    k,
-  };
+  const binds: Record<string, unknown> = { qtext, domain: domainId, st: sourceType, k };
   if (productId) binds.pid = productId;
   return q<MatchedChunk>(
     `SELECT id "chunk_id", text "text", source_type "source_type", author "author",
             author_credibility "author_credibility",
-            (1 - VECTOR_DISTANCE(embedding, TO_VECTOR(:qv), COSINE)) "similarity"
+            (1 - VECTOR_DISTANCE(embedding, ${QEMB}, COSINE)) "similarity"
      FROM chunks
      WHERE domain_id = :domain AND source_type = :st AND embedding IS NOT NULL ${productFilter}
-     ORDER BY VECTOR_DISTANCE(embedding, TO_VECTOR(:qv), COSINE)
+     ORDER BY VECTOR_DISTANCE(embedding, ${QEMB}, COSINE)
      FETCH FIRST :k ROWS ONLY`,
     binds,
   );
@@ -188,11 +187,9 @@ export async function ask(opts: {
   const domainId = await resolveDomainId(domainSlug);
   const productId = productSlug ? await resolveProductId(domainId, productSlug) : null;
 
-  const qv = await embedQuery(query);
-
   const rows: MatchedChunk[] = [];
-  if (expertK > 0) rows.push(...(await retrieve(qv, domainId, productId, "expert", expertK)));
-  if (publicK > 0) rows.push(...(await retrieve(qv, domainId, productId, "public_review", publicK)));
+  if (expertK > 0) rows.push(...(await retrieve(query, domainId, productId, "expert", expertK)));
+  if (publicK > 0) rows.push(...(await retrieve(query, domainId, productId, "public_review", publicK)));
 
   const citations = toCitations(rows);
   const userPrompt = `[질문]\n${query}\n\n[출처]\n${formatChunks(citations)}`;
