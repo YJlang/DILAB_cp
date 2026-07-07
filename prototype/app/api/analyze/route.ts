@@ -1,87 +1,62 @@
 /**
- * 제품 자동 분석 API (Phase 2) — Modal serverless 함수로 fire-and-forget.
+ * 제품 자동 분석 API — **로컬 파이프라인** 트리거 (원본은 Modal fire-and-forget).
  *
- * 1. analysis_jobs INSERT (status=pending) → job_id
- * 2. Modal trigger endpoint 호출 (즉시 응답)
+ * 1. analysis_jobs INSERT (status=pending) → job_id (Oracle)
+ * 2. 로컬 워커(scripts/run_analyze.py) detached spawn — 네이버 크롤→분석→Oracle 적재,
+ *    진행에 따라 analysis_jobs 갱신
  * 3. { job_id } 반환 → 클라이언트가 /api/analyze/status/[job_id] polling
  *
- * 무거운 분석 (60~120초) 은 Modal 백그라운드에서 진행, Supabase 큐에 진행률 갱신.
+ * ⚠️ 로컬 dev 전용 (venv python + Oracle). Cloudflare 배포 안 함.
  */
 import { NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
-import { cfEnv } from "@/lib/cf-env";
+import { randomUUID } from "node:crypto";
+import { spawn } from "node:child_process";
+import { q } from "@/lib/oracle";
 
 export const runtime = "nodejs";
 
+const REPO = "/Users/junha/Desktop/DILAB 복사본";
+const PY = `${REPO}/.venv/bin/python`;
+const SCRIPT = `${REPO}/scripts/run_analyze.py`;
+
 export async function POST(req: Request) {
   try {
-    const body = (await req.json()) as {
-      product_query?: string;
-      domain_slug?: string;
-    };
-    if (!body.product_query || body.product_query.trim().length < 2) {
-      return NextResponse.json(
-        { error: "product_query required (min 2 chars)" },
-        { status: 400 },
-      );
+    const body = (await req.json()) as { product_query?: string; domain_slug?: string };
+    const query = body.product_query?.trim();
+    if (!query || query.length < 2) {
+      return NextResponse.json({ error: "product_query required (min 2 chars)" }, { status: 400 });
     }
     const domainSlug = body.domain_slug ?? "cosmetics";
+    const jobId = randomUUID();
 
-    // [Oracle 전환 복제본] 신규 제품 분석은 Modal 인제스트 파이프라인(크롤링→ML→적재) +
-    // Supabase write 경로라 이 로컬 Oracle 데모에선 비활성화. 기존 제품은 브라우징·Ask 가능.
-    if (!process.env.SUPABASE_URL || !process.env.MODAL_TRIGGER_URL) {
-      return NextResponse.json(
-        {
-          error:
-            "신규 제품 분석은 Modal 인제스트 파이프라인(리뷰 크롤링·임베딩·토픽·평점 생성)이 필요해, " +
-            "이 로컬 Oracle 데모에선 비활성화돼 있어요. 이미 분석된 제품은 대시보드·제품·Ask 에서 보실 수 있습니다.",
-        },
-        { status: 501 },
-      );
-    }
+    await q(
+      `INSERT INTO analysis_jobs (id, product_query, domain_slug, status, progress, created_at, updated_at)
+       VALUES (:id, :q, :d, 'pending', :prog, SYSTIMESTAMP, SYSTIMESTAMP)`,
+      {
+        id: jobId,
+        q: query,
+        d: domainSlug,
+        prog: JSON.stringify({ step: 0, of_steps: 3, message: "분석 큐에 등록됨" }),
+      },
+    );
 
-    const { data, error } = await supabase
-      .from("analysis_jobs")
-      .insert({
-        product_query: body.product_query.trim(),
-        domain_slug: domainSlug,
-        status: "pending",
-        progress: { step: 0, of_steps: 3, message: "큐에 등록됨" },
-      })
-      .select("id")
-      .single();
-    if (error || !data) {
-      console.error("[/api/analyze] insert", error);
-      return NextResponse.json(
-        { error: `queue insert: ${error?.message ?? "unknown"}` },
-        { status: 500 },
-      );
-    }
-    const jobId = data.id as string;
-
-    const env = cfEnv();
-    const trigger = await fetch(env.MODAL_TRIGGER_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        _token: env.MODAL_PROXY_TOKEN,
-        job_id: jobId,
-        product_query: body.product_query.trim(),
-        domain_slug: domainSlug,
-      }),
+    // 로컬 워커를 detached 로 실행 (요청 응답 후에도 백그라운드에서 진행).
+    // stdio 를 로그 파일로 보내 spawn/실행 오류를 추적 (ignore 면 조용히 죽음).
+    const { openSync } = await import("node:fs");
+    const logfd = openSync("/tmp/dilab_worker.log", "a");
+    const child = spawn(PY, [SCRIPT, jobId, query], {
+      cwd: REPO,
+      detached: true,
+      stdio: ["ignore", logfd, logfd],
     });
-    if (!trigger.ok) {
-      const txt = await trigger.text();
-      await supabase
-        .from("analysis_jobs")
-        .update({ status: "error", error: `Modal trigger ${trigger.status}: ${txt.slice(0, 200)}` })
-        .eq("id", jobId);
-      console.error("[/api/analyze] modal trigger", trigger.status, txt);
-      return NextResponse.json(
-        { error: `Modal trigger ${trigger.status}`, job_id: jobId },
-        { status: 502 },
-      );
-    }
+    child.on("error", (err) => {
+      console.error("[/api/analyze] spawn 실패:", err);
+      void q(
+        `UPDATE analysis_jobs SET status='error', error=:e, updated_at=SYSTIMESTAMP WHERE id=:id`,
+        { e: `worker spawn 실패: ${err.message}`.slice(0, 500), id: jobId },
+      ).catch(() => {});
+    });
+    child.unref();
 
     return NextResponse.json({ job_id: jobId, status: "pending" });
   } catch (e) {

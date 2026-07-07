@@ -39,6 +39,7 @@ export async function q<T = Record<string, unknown>>(
   try {
     const r = await conn.execute<T>(sql, binds, {
       outFormat: oracledb.OUT_FORMAT_OBJECT,
+      autoCommit: true, // SELECT 무해, DML(INSERT/UPDATE)은 즉시 커밋
     });
     return (r.rows ?? []) as T[];
   } finally {
