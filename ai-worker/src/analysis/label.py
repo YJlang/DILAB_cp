@@ -99,6 +99,7 @@ def label_chunk(chunk_id: str, text: str, domain_meta: dict[str, Any]) -> ChunkL
             {"role": "system", "content": SYSTEM_PROMPT},
             {"role": "user", "content": user_prompt},
         ],
+        model=settings.label_model,  # 라벨링은 빠른 v4-flash (Ask 는 v4-pro)
         temperature=0.0,
         max_tokens=2500,  # 추론모델은 reasoning 이 토큰을 소모 → 작으면 content 가 비어 라벨이 조용히 깨짐
     )
