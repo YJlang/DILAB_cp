@@ -78,28 +78,35 @@ async function resolveProductId(domainId: string, productSlug: string): Promise<
   throw new Error(`product slug not found: ${productSlug}`);
 }
 
-// 질문을 Oracle 안에서 임베딩(e5, 'query: ' 프리픽스)하고 바로 VECTOR_DISTANCE.
-// TO_VECTOR/외부 임베더 없이 텍스트만 넘기면 DB가 임베딩까지 처리.
-const QEMB = "VECTOR_EMBEDDING(DILAB_E5 USING 'query: ' || :qtext AS data)";
-
-async function retrieve(
+// 전문가·일반 top-k 를 **한 쿼리**로. 질문 임베딩(e5, 'query:' 프리픽스)은 CTE 에서 1회만
+// 수행(기존엔 소스별×SELECT/ORDER 로 4회 재실행) → in-DB 임베딩 호출·왕복 최소화.
+// ROW_NUMBER 로 source_type 별 top-k 를 뽑고 전문가 우선 정렬 → 출력은 기존과 동일.
+async function retrieveHybrid(
   qtext: string,
   domainId: string,
   productId: string | null,
-  sourceType: "expert" | "public_review",
-  k: number,
+  expertK: number,
+  publicK: number,
 ): Promise<MatchedChunk[]> {
-  const productFilter = productId ? "AND product_id = :pid" : "";
-  const binds: Record<string, unknown> = { qtext, domain: domainId, st: sourceType, k };
+  const productFilter = productId ? "AND c.product_id = :pid" : "";
+  const binds: Record<string, unknown> = { qtext, domain: domainId, ek: expertK, pk: publicK };
   if (productId) binds.pid = productId;
   return q<MatchedChunk>(
-    `SELECT id "chunk_id", text "text", source_type "source_type", author "author",
-            author_credibility "author_credibility",
-            (1 - VECTOR_DISTANCE(embedding, ${QEMB}, COSINE)) "similarity"
-     FROM chunks
-     WHERE domain_id = :domain AND source_type = :st AND embedding IS NOT NULL ${productFilter}
-     ORDER BY VECTOR_DISTANCE(embedding, ${QEMB}, COSINE)
-     FETCH FIRST :k ROWS ONLY`,
+    `WITH q AS (SELECT VECTOR_EMBEDDING(DILAB_E5 USING 'query: ' || :qtext AS data) AS qv FROM dual)
+     SELECT chunk_id "chunk_id", text "text", source_type "source_type", author "author",
+            author_credibility "author_credibility", similarity "similarity"
+     FROM (
+       SELECT c.id AS chunk_id, c.text, c.source_type, c.author, c.author_credibility,
+              (1 - VECTOR_DISTANCE(c.embedding, q.qv, COSINE)) AS similarity,
+              ROW_NUMBER() OVER (PARTITION BY c.source_type
+                                 ORDER BY VECTOR_DISTANCE(c.embedding, q.qv, COSINE)) AS rn
+       FROM chunks c CROSS JOIN q
+       WHERE c.domain_id = :domain AND c.source_type IN ('expert', 'public_review')
+         AND c.embedding IS NOT NULL ${productFilter}
+     )
+     WHERE (source_type = 'expert' AND rn <= :ek)
+        OR (source_type = 'public_review' AND rn <= :pk)
+     ORDER BY CASE source_type WHEN 'expert' THEN 0 ELSE 1 END, similarity DESC`,
     binds,
   );
 }
@@ -187,9 +194,7 @@ export async function ask(opts: {
   const domainId = await resolveDomainId(domainSlug);
   const productId = productSlug ? await resolveProductId(domainId, productSlug) : null;
 
-  const rows: MatchedChunk[] = [];
-  if (expertK > 0) rows.push(...(await retrieve(query, domainId, productId, "expert", expertK)));
-  if (publicK > 0) rows.push(...(await retrieve(query, domainId, productId, "public_review", publicK)));
+  const rows = await retrieveHybrid(query, domainId, productId, expertK, publicK);
 
   const citations = toCitations(rows);
   const userPrompt = `[질문]\n${query}\n\n[출처]\n${formatChunks(citations)}`;
