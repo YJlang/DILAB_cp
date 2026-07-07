@@ -1,16 +1,12 @@
 /**
- * DILAB Ask RAG — Cloudflare Workers 안에서 직접 수행하는 hybrid retrieval +
- * DeepSeek 합성. ai-worker/src/rag/answer.py 의 TypeScript port.
+ * DILAB Ask RAG — **Oracle 26ai** 판 (원본 Supabase match_chunks 대체).
  *
- * 단계: query → BGE-M3 임베딩 → match_chunks RPC (expert + public) →
- *       chunks 블록 구성 → DeepSeek chat → JSON 파싱 → 답변 + 출처.
+ * query → BGE-M3 임베딩(LM Studio) → Oracle 하이브리드 검색(expert+public) →
+ * chunks 블록 → DeepSeek chat → JSON 파싱 → 답변 + 출처.
  *
- * Phase 1 은 영속화(ask_queries/responses/citations INSERT) skip — 현재 RLS 가
- * anon 으로 INSERT 거부하므로 service_role 키를 Cloudflare 에 두지 않기 위함.
- * Phase 2 에서 RLS 마이그레이션 후 영속화 켤 예정.
+ * ⚠️ 로컬 dev 전용(node-oracledb). 시그니처·반환 타입은 원본과 동일 → UI 변경 없음.
  */
-import { supabase } from "./supabase";
-import { cfEnv } from "./cf-env";
+import { q } from "./oracle";
 import { embedQuery } from "./embeddings";
 
 const SYSTEM_PROMPT = `당신은 화장품 도메인 RAG 어시스턴트 DILAB Ask 입니다.
@@ -58,27 +54,26 @@ type MatchedChunk = {
 };
 
 async function resolveDomainId(domainSlug: string): Promise<string> {
-  const { data, error } = await supabase
-    .from("domains")
-    .select("id")
-    .eq("slug", domainSlug)
-    .single();
-  if (error || !data) throw new Error(`domain not found: ${domainSlug}`);
-  return data.id as string;
+  const rows = await q<{ id: string }>(`SELECT id "id" FROM domains WHERE slug = :slug`, {
+    slug: domainSlug,
+  });
+  if (!rows[0]) throw new Error(`domain not found: ${domainSlug}`);
+  return rows[0].id;
 }
 
-async function resolveProductId(
-  domainId: string,
-  productSlug: string,
-): Promise<string> {
-  const { data, error } = await supabase
-    .from("products")
-    .select("id, metadata")
-    .eq("domain_id", domainId);
-  if (error) throw error;
-  for (const row of data ?? []) {
-    const slug = (row.metadata as { slug?: string } | null)?.slug;
-    if (slug === productSlug) return row.id as string;
+async function resolveProductId(domainId: string, productSlug: string): Promise<string> {
+  const rows = await q<{ id: string; metadata: string }>(
+    `SELECT id "id", metadata "metadata" FROM products WHERE domain_id = :d`,
+    { d: domainId },
+  );
+  for (const row of rows) {
+    let slug: string | undefined;
+    try {
+      slug = JSON.parse(row.metadata)?.slug;
+    } catch {
+      /* ignore */
+    }
+    if (slug === productSlug) return row.id;
   }
   throw new Error(`product slug not found: ${productSlug}`);
 }
@@ -90,16 +85,24 @@ async function retrieve(
   sourceType: "expert" | "public_review",
   k: number,
 ): Promise<MatchedChunk[]> {
-  const { data, error } = await supabase.rpc("match_chunks", {
-    query_embedding: qv,
-    match_domain_id: domainId,
-    match_product_id: productId,
-    match_source_type: sourceType,
-    match_count: k,
-    prefer_expert: false,
-  });
-  if (error) throw new Error(`match_chunks RPC: ${error.message}`);
-  return (data ?? []) as MatchedChunk[];
+  const productFilter = productId ? "AND product_id = :pid" : "";
+  const binds: Record<string, unknown> = {
+    qv: JSON.stringify(qv),
+    domain: domainId,
+    st: sourceType,
+    k,
+  };
+  if (productId) binds.pid = productId;
+  return q<MatchedChunk>(
+    `SELECT id "chunk_id", text "text", source_type "source_type", author "author",
+            author_credibility "author_credibility",
+            (1 - VECTOR_DISTANCE(embedding, TO_VECTOR(:qv), COSINE)) "similarity"
+     FROM chunks
+     WHERE domain_id = :domain AND source_type = :st AND embedding IS NOT NULL ${productFilter}
+     ORDER BY VECTOR_DISTANCE(embedding, TO_VECTOR(:qv), COSINE)
+     FETCH FIRST :k ROWS ONLY`,
+    binds,
+  );
 }
 
 function parseJsonAnswer(raw: string): { answer: string; recommendation: string } {
@@ -115,12 +118,9 @@ function parseJsonAnswer(raw: string): { answer: string; recommendation: string 
   if (start >= 0 && end > start) {
     try {
       const obj = JSON.parse(text.slice(start, end + 1));
-      return {
-        answer: String(obj.answer ?? raw),
-        recommendation: String(obj.recommendation ?? ""),
-      };
+      return { answer: String(obj.answer ?? raw), recommendation: String(obj.recommendation ?? "") };
     } catch {
-      // fall through
+      /* fall through */
     }
   }
   return { answer: raw, recommendation: "" };
@@ -150,33 +150,29 @@ function formatChunks(citations: Citation[]): string {
 
 type DeepSeekResponse = {
   choices?: Array<{ message?: { content?: string } }>;
-  error?: { message?: string };
 };
 
 async function deepseekChat(messages: Array<{ role: string; content: string }>): Promise<string> {
-  const env = cfEnv();
-  const res = await fetch(`${env.DEEPSEEK_BASE_URL}/v1/chat/completions`, {
+  const base = process.env.DEEPSEEK_BASE_URL ?? "https://api.deepseek.com";
+  const res = await fetch(`${base}/v1/chat/completions`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${env.DEEPSEEK_API_KEY}`,
+      Authorization: `Bearer ${process.env.DEEPSEEK_API_KEY}`,
     },
     body: JSON.stringify({
-      model: env.LLM_MODEL,
+      model: process.env.LLM_MODEL ?? "deepseek-chat",
       messages,
       temperature: 0.2,
       max_tokens: 800,
     }),
   });
   if (!res.ok) {
-    const txt = await res.text();
-    throw new Error(`DeepSeek ${res.status}: ${txt.slice(0, 300)}`);
+    throw new Error(`DeepSeek ${res.status}: ${(await res.text()).slice(0, 300)}`);
   }
   const json = (await res.json()) as DeepSeekResponse;
   const content = json.choices?.[0]?.message?.content;
-  if (!content) {
-    throw new Error(`DeepSeek empty content: ${JSON.stringify(json).slice(0, 200)}`);
-  }
+  if (!content) throw new Error("DeepSeek empty content");
   return content;
 }
 
@@ -187,13 +183,7 @@ export async function ask(opts: {
   expertK?: number;
   publicK?: number;
 }): Promise<AskAnswer> {
-  const {
-    query,
-    domainSlug = "cosmetics",
-    productSlug = null,
-    expertK = 3,
-    publicK = 3,
-  } = opts;
+  const { query, domainSlug = "cosmetics", productSlug = null, expertK = 3, publicK = 3 } = opts;
 
   const domainId = await resolveDomainId(domainSlug);
   const productId = productSlug ? await resolveProductId(domainId, productSlug) : null;
@@ -215,13 +205,12 @@ export async function ask(opts: {
   const latencyMs = Date.now() - start;
   const { answer, recommendation } = parseJsonAnswer(raw);
 
-  const env = cfEnv();
   return {
     query,
     answer,
     recommendation,
     citations,
-    llm_model: env.LLM_MODEL,
+    llm_model: process.env.LLM_MODEL ?? "deepseek-chat",
     latency_ms: latencyMs,
     expert_count: citations.filter((c) => c.cite_type === "expert").length,
     public_count: citations.filter((c) => c.cite_type === "public").length,
