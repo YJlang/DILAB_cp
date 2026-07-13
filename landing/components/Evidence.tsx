@@ -2,30 +2,12 @@
 
 import { useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
+import { useLang } from "@/lib/i18n";
 import { Reveal } from "./Reveal";
 
-const AXES = [
-  { name: "Absorption", score: 4.8 },
-  { name: "Gentleness", score: 4.7 },
-  { name: "Texture", score: 4.6 },
-  { name: "Value", score: 4.5 },
-  { name: "Scent", score: 4.2 },
-];
-
-const EVIDENCE = [
-  {
-    quote: "Absorbs fast, zero stickiness — even in summer.",
-    source: "verified purchaser",
-  },
-  {
-    quote: "Fragrance-free and gentle on reactive skin.",
-    source: "dermatology blogger",
-  },
-  {
-    quote: "Half the price of my old cream, same glow.",
-    source: "repeat buyer",
-  },
-];
+// Scores are language-agnostic; axis labels come from the dictionary.
+const SCORES = [4.8, 4.7, 4.6, 4.5, 4.2];
+const OVERALL = 4.6;
 
 function Stars({ score }: { score: number }) {
   return (
@@ -57,8 +39,10 @@ function Star({ className }: { className?: string }) {
 }
 
 export function Evidence() {
+  const { t } = useLang();
   const [open, setOpen] = useState(false);
   const reduce = useReducedMotion();
+  const e = t.evidence;
 
   return (
     <section
@@ -69,32 +53,28 @@ export function Evidence() {
         {/* Left — narrative */}
         <div className="md:col-span-5">
           <Reveal>
-            <p className="eyebrow mb-8">03 — Evidence-first</p>
+            <p className="eyebrow mb-8">{e.eyebrow}</p>
           </Reveal>
           <Reveal delay={0.08}>
             <h2
               className="headline"
               style={{ fontSize: "clamp(2rem, 4.4vw, 3.4rem)" }}
             >
-              Don&rsquo;t take our word for it.
+              {e.headline.a}
               <br />
-              Take theirs.
+              {e.headline.b}
             </h2>
           </Reveal>
           <Reveal delay={0.16}>
             <p className="mt-8 max-w-md text-lg leading-relaxed text-body">
-              Our platform, DILAB, scores products on five axes — and every
-              score unfolds into the real sentences behind it.
+              {e.body}
             </p>
           </Reveal>
           <Reveal delay={0.24}>
             <p className="mt-6 font-mono-label text-xs uppercase tracking-[0.2em] text-amber">
-              <span className="hidden sm:inline">Hover the card</span>
-              <span className="sm:hidden">Tap the card</span>
-              <span className="text-body/50">
-                {" "}
-                to reveal the proof
-              </span>
+              <span className="hidden sm:inline">{e.hintHover}</span>
+              <span className="sm:hidden">{e.hintTap}</span>
+              <span className="text-body/50">{e.hintRest}</span>
             </p>
           </Reveal>
         </div>
@@ -110,9 +90,9 @@ export function Evidence() {
               onHoverStart={() => setOpen(true)}
               onHoverEnd={() => setOpen(false)}
               onClick={() => setOpen((v) => !v)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" || e.key === " ") {
-                  e.preventDefault();
+              onKeyDown={(ev) => {
+                if (ev.key === "Enter" || ev.key === " ") {
+                  ev.preventDefault();
                   setOpen((v) => !v);
                 }
               }}
@@ -121,10 +101,10 @@ export function Evidence() {
               <div className="flex items-start justify-between gap-6">
                 <div>
                   <p className="font-mono-label text-[0.65rem] uppercase tracking-[0.22em] text-body/50">
-                    Product score
+                    {e.scoreLabel}
                   </p>
                   <h3 className="mt-3 font-display text-xl text-ink">
-                    Barrier Repair Moisturizer
+                    {e.product}
                   </h3>
                 </div>
                 <div className="text-right">
@@ -132,25 +112,25 @@ export function Evidence() {
                     className="font-display leading-none text-ink"
                     style={{ fontSize: "clamp(2.6rem, 5vw, 3.6rem)" }}
                   >
-                    4.6
+                    {OVERALL.toFixed(1)}
                   </div>
                   <div className="mt-2 flex justify-end">
-                    <Stars score={4.6} />
+                    <Stars score={OVERALL} />
                   </div>
                 </div>
               </div>
 
               <div className="mt-8 space-y-3">
-                {AXES.map((a, i) => (
-                  <div key={a.name} className="flex items-center gap-4">
+                {e.axes.map((name, i) => (
+                  <div key={name} className="flex items-center gap-4">
                     <span className="w-24 shrink-0 font-mono-label text-[0.7rem] uppercase tracking-[0.12em] text-body">
-                      {a.name}
+                      {name}
                     </span>
                     <span className="relative h-[3px] flex-1 bg-line">
                       <motion.span
                         className="absolute inset-y-0 left-0 bg-amber"
                         initial={{ width: 0 }}
-                        whileInView={{ width: `${(a.score / 5) * 100}%` }}
+                        whileInView={{ width: `${(SCORES[i] / 5) * 100}%` }}
                         viewport={{ once: true, amount: 0.8 }}
                         transition={{
                           duration: reduce ? 0 : 0.9,
@@ -160,7 +140,7 @@ export function Evidence() {
                       />
                     </span>
                     <span className="w-8 shrink-0 text-right font-mono-label text-xs tabular-nums text-ink">
-                      {a.score.toFixed(1)}
+                      {SCORES[i].toFixed(1)}
                     </span>
                   </div>
                 ))}
@@ -173,7 +153,7 @@ export function Evidence() {
                   }`}
                 />
                 <span className="font-mono-label uppercase tracking-[0.15em]">
-                  {open ? "Evidence — 3 of 2,411 quotes" : "Backed by 2,411 quotes"}
+                  {open ? e.footerOpen : e.footerClosed}
                 </span>
               </div>
             </motion.div>
@@ -185,9 +165,9 @@ export function Evidence() {
             >
               <div className="overflow-hidden">
                 <div className="space-y-3 pt-3">
-                  {EVIDENCE.map((e, i) => (
+                  {e.quotes.map((q, i) => (
                     <div
-                      key={e.quote}
+                      key={q.quote}
                       className="border border-line bg-paper/70 p-5 backdrop-blur-sm transition-all duration-500"
                       style={{
                         transitionDelay: open ? `${120 + i * 90}ms` : "0ms",
@@ -199,10 +179,10 @@ export function Evidence() {
                       }}
                     >
                       <p className="font-display text-[1.05rem] italic leading-snug text-ink">
-                        &ldquo;{e.quote}&rdquo;
+                        &ldquo;{q.quote}&rdquo;
                       </p>
                       <p className="mt-2 font-mono-label text-[0.65rem] uppercase tracking-[0.18em] text-amber">
-                        {e.source}
+                        {q.source}
                       </p>
                     </div>
                   ))}

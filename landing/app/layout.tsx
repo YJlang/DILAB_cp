@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
-import { Fraunces, Inter, IBM_Plex_Mono } from "next/font/google";
+import { Fraunces, Inter, IBM_Plex_Mono, Noto_Serif_KR } from "next/font/google";
 import "./globals.css";
+import { LanguageProvider } from "@/lib/i18n";
 
 const fraunces = Fraunces({
   subsets: ["latin"],
@@ -20,6 +21,14 @@ const plexMono = IBM_Plex_Mono({
   variable: "--font-plex-mono",
   weight: ["400", "500"],
   display: "swap",
+});
+
+// Korean serif to pair with Fraunces for headlines (glyph-level fallback).
+const notoSerifKR = Noto_Serif_KR({
+  weight: ["400", "600"],
+  variable: "--font-noto-serif-kr",
+  display: "swap",
+  preload: false,
 });
 
 export const metadata: Metadata = {
@@ -43,9 +52,11 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${fraunces.variable} ${inter.variable} ${plexMono.variable} h-full`}
+      className={`${fraunces.variable} ${inter.variable} ${plexMono.variable} ${notoSerifKR.variable} h-full`}
     >
-      <body className="grain min-h-full antialiased">{children}</body>
+      <body className="grain min-h-full antialiased">
+        <LanguageProvider>{children}</LanguageProvider>
+      </body>
     </html>
   );
 }

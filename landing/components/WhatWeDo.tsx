@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { useLang } from "@/lib/i18n";
 import { Reveal, Stagger, staggerItem } from "./Reveal";
 
 /* Hand-drawn line marks — no icon library, brand-specific glyphs. */
@@ -55,28 +56,11 @@ function VerifyMark() {
   );
 }
 
-const CARDS = [
-  {
-    n: "i",
-    title: "Gather",
-    mark: <GatherMark />,
-    body: "Every voice, from quick reviews to expert deep-dives, collected in one place.",
-  },
-  {
-    n: "ii",
-    title: "Distill",
-    mark: <DistillMark />,
-    body: "Patterns emerge: what people love, what they doubt, and why.",
-  },
-  {
-    n: "iii",
-    title: "Verify",
-    mark: <VerifyMark />,
-    body: "Every conclusion stays traceable to the exact words that support it.",
-  },
-];
+const MARKS = [<GatherMark key="g" />, <DistillMark key="d" />, <VerifyMark key="v" />];
+const NUMERALS = ["i", "ii", "iii"];
 
 export function WhatWeDo() {
+  const { t } = useLang();
   return (
     <section
       id="approach"
@@ -84,21 +68,21 @@ export function WhatWeDo() {
     >
       <div className="mx-auto max-w-6xl px-6 sm:px-8">
         <Reveal>
-          <p className="eyebrow mb-8">02 — What we do</p>
+          <p className="eyebrow mb-8">{t.approach.eyebrow}</p>
         </Reveal>
         <Reveal delay={0.08}>
           <h2
             className="headline max-w-2xl"
             style={{ fontSize: "clamp(2rem, 4.6vw, 3.6rem)" }}
           >
-            We listen at scale.
+            {t.approach.headline.a}
             <br />
-            Then we prove it.
+            {t.approach.headline.b}
           </h2>
         </Reveal>
 
         <Stagger className="mt-16 grid gap-px overflow-hidden border border-line bg-line sm:grid-cols-3">
-          {CARDS.map((c) => (
+          {t.approach.cards.map((c, i) => (
             <motion.article
               key={c.title}
               variants={staggerItem}
@@ -110,10 +94,10 @@ export function WhatWeDo() {
               />
               <div className="flex items-center justify-between">
                 <span className="text-amber transition-transform duration-500 group-hover:-translate-y-0.5">
-                  {c.mark}
+                  {MARKS[i]}
                 </span>
                 <span className="font-mono-label text-xs uppercase tracking-[0.2em] text-body/50">
-                  {c.n}
+                  {NUMERALS[i]}
                 </span>
               </div>
               <h3

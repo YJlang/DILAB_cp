@@ -1,0 +1,147 @@
+- generic [active] [ref=f9e1]:
+  - banner [ref=f9e2]:
+    - navigation [ref=f9e3]:
+      - link "Deep Insight Lab — home" [ref=f9e4] [cursor=pointer]:
+        - /url: "#top"
+        - text: deep insight lab
+      - generic [ref=f9e5]:
+        - link "Work with us" [ref=f9e6] [cursor=pointer]:
+          - /url: "#contact"
+        - button "Language" [ref=f9e10]:
+          - generic [ref=f9e11]: EN
+          - generic [ref=f9e12]: ▾
+  - main [ref=f9e13]:
+    - generic [ref=f9e14]:
+      - generic [ref=f9e16]:
+        - paragraph [ref=f9e17]:
+          - generic [ref=f9e18]: “”
+        - heading "Ten thousand reviews. One honest answer." [level=1] [ref=f9e20]: Ten thousand reviews.One honest answer.
+        - paragraph [ref=f9e21]: Deep Insight Lab turns the chaos of consumer voices into evidence you can act on.
+        - link "See how →" [ref=f9e23] [cursor=pointer]:
+          - /url: "#problem"
+          - text: See how
+          - generic [ref=f9e24]: →
+      - generic [ref=f9e25]: Scroll
+    - generic [ref=f9e30]:
+      - paragraph [ref=f9e32]: 01 — The problem
+      - generic [ref=f9e33]:
+        - generic [ref=f9e34]:
+          - generic [ref=f9e35]: "0"
+          - generic [ref=f9e36]: review fragments
+        - generic [ref=f9e37]:
+          - generic [ref=f9e38]: "0"
+          - generic [ref=f9e39]: contradictions per product
+        - generic [ref=f9e40]:
+          - generic [ref=f9e41]: "0"
+          - generic [ref=f9e42]: clear answers
+      - generic [ref=f9e43]:
+        - heading "Everyone is talking. No one is sure." [level=2] [ref=f9e45]: Everyone is talking.No one is sure.
+        - paragraph [ref=f9e47]: Star ratings average away the truth. Sponsored posts blur it. Real signal drowns in noise — and decisions stall.
+    - generic [ref=f9e49]:
+      - paragraph [ref=f9e51]: 02 — What we do
+      - heading "We listen at scale. Then we prove it." [level=2] [ref=f9e53]: We listen at scale.Then we prove it.
+      - generic [ref=f9e54]:
+        - article [ref=f9e55]:
+          - generic [ref=f9e56]: i
+          - heading "Gather" [level=3] [ref=f9e62]
+          - paragraph [ref=f9e63]: Every voice, from quick reviews to expert deep-dives, collected in one place.
+        - article [ref=f9e64]:
+          - generic [ref=f9e65]: ii
+          - heading "Distill" [level=3] [ref=f9e70]
+          - paragraph [ref=f9e71]: "Patterns emerge: what people love, what they doubt, and why."
+        - article [ref=f9e72]:
+          - generic [ref=f9e73]: iii
+          - heading "Verify" [level=3] [ref=f9e79]
+          - paragraph [ref=f9e80]: Every conclusion stays traceable to the exact words that support it.
+    - generic [ref=f9e82]:
+      - generic [ref=f9e84]:
+        - paragraph [ref=f9e85]: 03 — What changes for you
+        - heading "Guesswork out. Evidence in." [level=2] [ref=f9e86]: Guesswork out.Evidence in.
+      - generic [ref=f9e87]:
+        - article [ref=f9e88]:
+          - generic [ref=f9e89]:
+            - heading "Weeks → Days" [level=3] [ref=f9e90]
+            - generic [ref=f9e91]: "01"
+          - paragraph [ref=f9e93]: Decisions that waited on gut feeling now rest on traceable evidence.
+        - article [ref=f9e94]:
+          - generic [ref=f9e95]:
+            - heading "Two lenses, one picture" [level=3] [ref=f9e96]
+            - generic [ref=f9e97]: "02"
+          - paragraph [ref=f9e99]: Expert judgment and everyday experience, weighed together — so hype never outvotes truth.
+        - article [ref=f9e100]:
+          - generic [ref=f9e101]:
+            - heading "Every claim, sourced" [level=3] [ref=f9e102]
+            - generic [ref=f9e103]: "03"
+          - paragraph [ref=f9e105]: Ask "says who?" of any conclusion — and get the exact sentences behind it.
+        - article [ref=f9e106]:
+          - generic [ref=f9e107]:
+            - heading "Built to travel" [level=3] [ref=f9e108]
+            - generic [ref=f9e109]: "04"
+          - paragraph [ref=f9e111]: Born in beauty, designed for any category where opinions pile up.
+      - paragraph [ref=f9e113]: five axes · every score traceable · expert + consumer voices
+    - generic [ref=f9e115]:
+      - generic [ref=f9e116]:
+        - paragraph [ref=f9e118]: 04 — Evidence-first
+        - heading "Don’t take our word for it. Take theirs." [level=2] [ref=f9e120]: Don’t take our word for it.Take theirs.
+        - paragraph [ref=f9e122]: Our platform, DILAB, scores products on five axes — and every score unfolds into the real sentences behind it.
+        - paragraph [ref=f9e124]: Hover the card to reveal the proof
+      - generic [ref=f9e126]:
+        - button "Reveal the evidence behind the score" [ref=f9e127] [cursor=pointer]:
+          - generic [ref=f9e128]:
+            - generic [ref=f9e129]:
+              - paragraph [ref=f9e130]: Product score
+              - heading "Moisturizer — brand withheld" [level=3] [ref=f9e131]
+            - generic [ref=f9e132]: "4.6"
+          - generic [ref=f9e166]:
+            - generic [ref=f9e167]:
+              - generic [ref=f9e168]: Absorption
+              - generic [ref=f9e170]: "4.8"
+            - generic [ref=f9e171]:
+              - generic [ref=f9e172]: Gentleness
+              - generic [ref=f9e174]: "4.7"
+            - generic [ref=f9e175]:
+              - generic [ref=f9e176]: Texture
+              - generic [ref=f9e178]: "4.6"
+            - generic [ref=f9e179]:
+              - generic [ref=f9e180]: Value
+              - generic [ref=f9e182]: "4.5"
+            - generic [ref=f9e183]:
+              - generic [ref=f9e184]: Scent
+              - generic [ref=f9e186]: "4.2"
+          - generic [ref=f9e187]: Backed by 2,411 quotes
+        - generic [ref=f9e190]:
+          - generic [ref=f9e191]:
+            - paragraph [ref=f9e192]: “Absorbs fast, zero stickiness — even in summer.”
+            - paragraph [ref=f9e193]: verified purchaser
+          - generic [ref=f9e194]:
+            - paragraph [ref=f9e195]: “Fragrance-free and gentle on reactive skin.”
+            - paragraph [ref=f9e196]: dermatology blogger
+          - generic [ref=f9e197]:
+            - paragraph [ref=f9e198]: “Half the price of my old cream, same glow.”
+            - paragraph [ref=f9e199]: repeat buyer
+    - generic [ref=f9e201]:
+      - generic [ref=f9e202]:
+        - generic [ref=f9e203]:
+          - paragraph [ref=f9e204]: 05 — About
+          - heading "Research first. Always." [level=2] [ref=f9e205]: Research first.Always.
+        - paragraph [ref=f9e207]: Deep Insight Lab is a consumer-research company working with brands, retailers, and universities. We build tools that make honest answers inevitable.
+      - generic [ref=f9e209]:
+        - paragraph [ref=f9e210]: Working alongside
+        - generic [ref=f9e211]:
+          - generic [ref=f9e212]: academic research partners
+          - generic [ref=f9e213]: consumer brands
+          - generic [ref=f9e214]: retail platforms
+    - generic [ref=f9e216]:
+      - heading "Curious what ten thousand voices say about your product?" [level=2] [ref=f9e217]
+      - link "Start a conversation →" [ref=f9e219] [cursor=pointer]:
+        - /url: mailto:hello@deepinsightlab.example
+        - text: Start a conversation
+        - generic [ref=f9e220]: →
+  - contentinfo [ref=f9e221]:
+    - generic [ref=f9e222]:
+      - generic [ref=f9e223]: Deep Insight Lab — Seoul, Korea
+      - generic [ref=f9e224]:
+        - link "hello@deepinsightlab.example" [ref=f9e225] [cursor=pointer]:
+          - /url: mailto:hello@deepinsightlab.example
+        - generic [ref=f9e226]: © 2026
+  - button "Open Next.js Dev Tools" [ref=f9e232] [cursor=pointer]

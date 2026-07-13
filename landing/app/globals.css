@@ -38,21 +38,23 @@ html {
 body {
   background: var(--paper);
   color: var(--body);
-  font-family: var(--font-inter), system-ui, sans-serif;
+  font-family: var(--font-inter), "Apple SD Gothic Neo", "Pretendard",
+    system-ui, sans-serif;
   overflow-x: hidden;
 }
 
-/* Editorial helpers ------------------------------------------------- */
+/* Editorial helpers — Latin uses Fraunces, Hangul falls back to Noto Serif KR */
 .font-display {
-  font-family: var(--font-fraunces), Georgia, serif;
+  font-family: var(--font-fraunces), var(--font-noto-serif-kr), Georgia, serif;
   font-optical-sizing: auto;
 }
 .font-mono-label {
-  font-family: var(--font-plex-mono), ui-monospace, monospace;
+  font-family: var(--font-plex-mono), "Apple SD Gothic Neo", ui-monospace,
+    monospace;
 }
 
 .headline {
-  font-family: var(--font-fraunces), Georgia, serif;
+  font-family: var(--font-fraunces), var(--font-noto-serif-kr), Georgia, serif;
   color: var(--ink);
   font-weight: 400;
   letter-spacing: -0.025em;
@@ -60,8 +62,16 @@ body {
   text-wrap: balance;
 }
 
+/* Korean headlines read better with a touch more line-height and no negative tracking */
+:root[lang="ko"] .headline {
+  letter-spacing: -0.01em;
+  line-height: 1.12;
+  word-break: keep-all;
+}
+
 .eyebrow {
-  font-family: var(--font-plex-mono), ui-monospace, monospace;
+  font-family: var(--font-plex-mono), "Apple SD Gothic Neo", ui-monospace,
+    monospace;
   font-size: 0.72rem;
   letter-spacing: 0.22em;
   text-transform: uppercase;

@@ -1,15 +1,13 @@
 "use client";
 
+import { useLang } from "@/lib/i18n";
 import { Counter } from "./Counter";
 import { Reveal } from "./Reveal";
 
-const STATS = [
-  { value: 12458, label: "review fragments" },
-  { value: 47, label: "contradictions per product" },
-  { value: 0, label: "clear answers" },
-];
+const VALUES = [12458, 47, 0];
 
 export function Problem() {
+  const { t } = useLang();
   return (
     <section
       id="problem"
@@ -17,13 +15,13 @@ export function Problem() {
     >
       <div className="mx-auto max-w-6xl px-6 sm:px-8">
         <Reveal>
-          <p className="eyebrow mb-14">01 — The problem</p>
+          <p className="eyebrow mb-14">{t.problem.eyebrow}</p>
         </Reveal>
 
         <div className="grid gap-y-12 border-y border-line py-14 sm:grid-cols-3 sm:gap-x-8">
-          {STATS.map((s, i) => (
+          {VALUES.map((value, i) => (
             <Reveal
-              key={s.label}
+              key={i}
               delay={i * 0.12}
               className="flex flex-col gap-3 sm:border-l sm:border-line sm:pl-8 sm:first:border-l-0 sm:first:pl-0"
             >
@@ -31,10 +29,10 @@ export function Problem() {
                 className="font-display tabular-nums text-ink"
                 style={{ fontSize: "clamp(2.6rem, 6vw, 4.4rem)", lineHeight: 1 }}
               >
-                <Counter value={s.value} />
+                <Counter value={value} />
               </span>
               <span className="font-mono-label text-xs uppercase tracking-[0.16em] text-body">
-                {s.label}
+                {t.problem.labels[i]}
               </span>
             </Reveal>
           ))}
@@ -46,15 +44,14 @@ export function Problem() {
               className="headline"
               style={{ fontSize: "clamp(2rem, 4.4vw, 3.4rem)" }}
             >
-              Everyone is talking.
+              {t.problem.headline.a}
               <br />
-              No one is sure.
+              {t.problem.headline.b}
             </h2>
           </Reveal>
           <Reveal className="md:col-span-5 md:col-start-8" delay={0.15}>
             <p className="text-lg leading-relaxed text-body">
-              Star ratings average away the truth. Sponsored posts blur it. Real
-              signal drowns in noise — and decisions stall.
+              {t.problem.body}
             </p>
           </Reveal>
         </div>

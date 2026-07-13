@@ -1,8 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useLang } from "@/lib/i18n";
+import { LangSwitch } from "./LangSwitch";
 
 export function Nav() {
+  const { t } = useLang();
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
@@ -28,16 +31,19 @@ export function Nav() {
         >
           deep insight lab
         </a>
-        <a
-          href="#contact"
-          className="group inline-flex items-center gap-2 text-sm font-medium text-ink"
-        >
-          <span className="link-underline">Work with us</span>
-          <span
-            aria-hidden
-            className="h-1.5 w-1.5 rounded-full bg-amber transition-transform duration-300 group-hover:scale-125"
-          />
-        </a>
+        <div className="flex items-center gap-5 sm:gap-7">
+          <a
+            href="#contact"
+            className="group hidden items-center gap-2 text-sm font-medium text-ink sm:inline-flex"
+          >
+            <span className="link-underline">{t.nav.cta}</span>
+            <span
+              aria-hidden
+              className="h-1.5 w-1.5 rounded-full bg-amber transition-transform duration-300 group-hover:scale-125"
+            />
+          </a>
+          <LangSwitch />
+        </div>
       </nav>
     </header>
   );

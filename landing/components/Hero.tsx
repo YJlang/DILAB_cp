@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import { motion, useReducedMotion } from "framer-motion";
+import { useLang } from "@/lib/i18n";
 import { TypingCycle } from "./TypingCycle";
 
 const ParticleField = dynamic(() => import("./ParticleField"), { ssr: false });
@@ -11,6 +12,7 @@ const EASE = [0.22, 1, 0.36, 1] as const;
 
 export function Hero() {
   const reduce = useReducedMotion();
+  const { t } = useLang();
   const [canvas, setCanvas] = useState<{ show: boolean; count: number }>({
     show: false,
     count: 0,
@@ -80,9 +82,11 @@ export function Hero() {
             className="headline"
             style={{ fontSize: "clamp(2.9rem, 8.4vw, 6.6rem)" }}
           >
-            Ten thousand reviews.
+            {t.hero.headline.line1}
             <br />
-            One <span className="italic text-amber">honest</span> answer.
+            {t.hero.headline.pre}
+            <span className="italic text-amber">{t.hero.headline.accent}</span>
+            {t.hero.headline.post}
           </motion.h1>
 
           <motion.p
@@ -91,8 +95,7 @@ export function Hero() {
             transition={{ duration: 0.9, delay: 0.28, ease: EASE }}
             className="mt-8 max-w-xl text-base leading-relaxed text-body sm:text-lg"
           >
-            Deep Insight Lab turns the chaos of consumer voices into evidence
-            you can act on.
+            {t.hero.sub}
           </motion.p>
 
           <motion.div
@@ -105,7 +108,7 @@ export function Hero() {
               href="#problem"
               className="group inline-flex items-center gap-2 border-b border-ink/30 pb-1 text-sm font-medium tracking-wide text-ink transition-colors hover:border-amber hover:text-amber"
             >
-              See how
+              {t.hero.cta}
               <span className="transition-transform duration-300 group-hover:translate-x-1">
                 &rarr;
               </span>
@@ -124,7 +127,7 @@ export function Hero() {
       >
         <div className="flex flex-col items-center gap-2">
           <span className="font-mono-label text-[0.6rem] uppercase tracking-[0.3em] text-body/60">
-            Scroll
+            {t.hero.scroll}
           </span>
           <span className="h-10 w-px bg-gradient-to-b from-ink/40 to-transparent" />
         </div>

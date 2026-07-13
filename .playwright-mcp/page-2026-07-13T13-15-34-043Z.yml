@@ -1,0 +1,148 @@
+- generic [active] [ref=f9e1]:
+  - banner [ref=f9e2]:
+    - navigation [ref=f9e3]:
+      - link "Deep Insight Lab — home" [ref=f9e4] [cursor=pointer]:
+        - /url: "#top"
+        - text: deep insight lab
+      - generic [ref=f9e5]:
+        - link "함께 하기" [ref=f9e257] [cursor=pointer]:
+          - /url: "#contact"
+        - button "언어" [ref=f9e258]:
+          - generic [ref=f9e11]: 한국어
+          - generic [ref=f9e12]: ▾
+  - main [ref=f9e13]:
+    - generic [ref=f9e14]:
+      - generic [ref=f9e16]:
+        - paragraph [ref=f9e17]:
+          - generic [ref=f9e367]: “”
+        - heading "수만 개의 리뷰. 단 하나의 정직한 답." [level=1] [ref=f9e261]: 수만 개의 리뷰.단 하나의 정직한 답.
+        - paragraph [ref=f9e21]: 딥인사이트랩은 쏟아지는 소비자의 목소리를, 행동할 수 있는 근거로 바꿉니다.
+        - link "어떻게 하는지 보기 →" [ref=f9e262] [cursor=pointer]:
+          - /url: "#problem"
+          - text: 어떻게 하는지 보기
+          - generic [ref=f9e24]: →
+      - generic [ref=f9e25]: 스크롤
+    - generic [ref=f9e30]:
+      - paragraph [ref=f9e32]: 01 — 문제
+      - generic [ref=f9e33]:
+        - generic [ref=f9e34]:
+          - generic [ref=f9e35]: "0"
+          - generic [ref=f9e36]: 리뷰 조각
+        - generic [ref=f9e37]:
+          - generic [ref=f9e38]: "0"
+          - generic [ref=f9e39]: 제품당 모순
+        - generic [ref=f9e40]:
+          - generic [ref=f9e41]: "0"
+          - generic [ref=f9e42]: 명확한 답
+      - generic [ref=f9e43]:
+        - heading "모두가 말하지만, 누구도 확신하지 못합니다." [level=2] [ref=f9e263]: 모두가 말하지만,누구도 확신하지 못합니다.
+        - paragraph [ref=f9e47]: 별점 평균은 진실을 뭉갭니다. 광고성 후기는 진실을 흐립니다. 진짜 신호는 소음에 묻히고 — 결정은 멈춥니다.
+    - generic [ref=f9e49]:
+      - paragraph [ref=f9e51]: 02 — 하는 일
+      - heading "대규모로 듣고, 근거로 증명합니다." [level=2] [ref=f9e264]: 대규모로 듣고,근거로 증명합니다.
+      - generic [ref=f9e54]:
+        - article [ref=f9e265]:
+          - generic [ref=f9e266]: i
+          - heading "모으다" [level=3] [ref=f9e272]
+          - paragraph [ref=f9e273]: 짧은 후기부터 전문가의 심층 리뷰까지, 모든 목소리를 한곳에 모읍니다.
+        - article [ref=f9e274]:
+          - generic [ref=f9e275]: ii
+          - heading "꿰뚫다" [level=3] [ref=f9e280]
+          - paragraph [ref=f9e281]: 사람들이 무엇을 사랑하고, 무엇을 의심하며, 왜 그런지 — 패턴이 드러납니다.
+        - article [ref=f9e282]:
+          - generic [ref=f9e283]: iii
+          - heading "증명하다" [level=3] [ref=f9e289]
+          - paragraph [ref=f9e290]: 모든 결론은 그것을 뒷받침한 바로 그 문장까지 추적됩니다.
+    - generic [ref=f9e82]:
+      - generic [ref=f9e84]:
+        - paragraph [ref=f9e85]: 03 — 무엇이 달라지나
+        - heading "감이 아니라, 근거로." [level=2] [ref=f9e291]: 감이 아니라,근거로.
+      - generic [ref=f9e87]:
+        - article [ref=f9e292]:
+          - generic [ref=f9e293]:
+            - heading "몇 주 → 며칠" [level=3] [ref=f9e294]
+            - generic [ref=f9e295]: "01"
+          - paragraph [ref=f9e297]: 감에 기대 몇 주씩 미뤄지던 결정이, 추적 가능한 근거 위에서 며칠 만에 끝납니다.
+        - article [ref=f9e298]:
+          - generic [ref=f9e299]:
+            - heading "두 개의 렌즈, 하나의 그림" [level=3] [ref=f9e300]
+            - generic [ref=f9e301]: "02"
+          - paragraph [ref=f9e303]: 전문가의 판단과 일상의 경험을 함께 저울질해, 과장이 진실을 이기지 못하게 합니다.
+        - article [ref=f9e304]:
+          - generic [ref=f9e305]:
+            - heading "모든 주장에 출처를" [level=3] [ref=f9e306]
+            - generic [ref=f9e307]: "03"
+          - paragraph [ref=f9e309]: 어떤 결론에든 "누가 그래?"라고 물어보세요. 그 근거가 된 문장이 그대로 나옵니다.
+        - article [ref=f9e310]:
+          - generic [ref=f9e311]:
+            - heading "어디로든 확장" [level=3] [ref=f9e312]
+            - generic [ref=f9e313]: "04"
+          - paragraph [ref=f9e315]: 뷰티에서 시작했지만, 의견이 쌓이는 모든 카테고리로 확장됩니다.
+      - paragraph [ref=f9e113]: 다섯 가지 축 · 모든 점수는 추적 가능 · 전문가와 소비자의 목소리
+    - generic [ref=f9e115]:
+      - generic [ref=f9e116]:
+        - paragraph [ref=f9e118]: 04 — 근거 우선
+        - heading "저희 말은 믿지 마세요. 그들의 말을 믿으세요." [level=2] [ref=f9e316]: 저희 말은 믿지 마세요.그들의 말을 믿으세요.
+        - paragraph [ref=f9e122]: 저희 플랫폼 DILAB은 제품을 다섯 가지 축으로 평가하고, 모든 점수는 그 뒤에 있는 실제 문장으로 펼쳐집니다.
+        - paragraph [ref=f9e124]: 카드에 올려보세요 근거가 드러납니다
+      - generic [ref=f9e126]:
+        - button "Reveal the evidence behind the score" [expanded] [ref=f9e127] [cursor=pointer]:
+          - generic [ref=f9e128]:
+            - generic [ref=f9e129]:
+              - paragraph [ref=f9e130]: 제품 점수
+              - heading "수분크림 — 브랜드 비공개" [level=3] [ref=f9e317]
+            - generic [ref=f9e132]: "4.6"
+          - generic [ref=f9e166]:
+            - generic [ref=f9e318]:
+              - generic [ref=f9e319]: 흡수력
+              - generic [ref=f9e321]: "4.8"
+            - generic [ref=f9e322]:
+              - generic [ref=f9e323]: 순함
+              - generic [ref=f9e325]: "4.7"
+            - generic [ref=f9e326]:
+              - generic [ref=f9e327]: 제형
+              - generic [ref=f9e329]: "4.6"
+            - generic [ref=f9e330]:
+              - generic [ref=f9e331]: 가성비
+              - generic [ref=f9e333]: "4.5"
+            - generic [ref=f9e334]:
+              - generic [ref=f9e335]: 향
+              - generic [ref=f9e337]: "4.2"
+          - generic [ref=f9e187]: 근거 — 2,411개 중 3개
+        - generic [ref=f9e190]:
+          - generic [ref=f9e338]:
+            - paragraph [ref=f9e339]: “흡수가 빠르고 끈적임이 전혀 없어요 — 여름에도요.”
+            - paragraph [ref=f9e340]: 구매 인증 사용자
+          - generic [ref=f9e341]:
+            - paragraph [ref=f9e342]: “무향에 예민한 피부에도 순해요.”
+            - paragraph [ref=f9e343]: 피부과 블로거
+          - generic [ref=f9e344]:
+            - paragraph [ref=f9e345]: “쓰던 크림 반값인데 광은 똑같아요.”
+            - paragraph [ref=f9e346]: 재구매 고객
+    - generic [ref=f9e201]:
+      - generic [ref=f9e202]:
+        - generic [ref=f9e203]:
+          - paragraph [ref=f9e204]: 05 — 소개
+          - heading "연구가 먼저입니다. 언제나." [level=2] [ref=f9e347]: 연구가 먼저입니다.언제나.
+        - paragraph [ref=f9e207]: 딥인사이트랩은 브랜드, 유통사, 대학과 함께 일하는 소비자 리서치 기업입니다. 정직한 답이 필연이 되도록 만드는 도구를 만듭니다.
+      - generic [ref=f9e209]:
+        - paragraph [ref=f9e210]: 함께 일합니다
+        - generic [ref=f9e211]:
+          - generic [ref=f9e348]: 대학·연구 파트너
+          - generic [ref=f9e349]: 소비자 브랜드
+          - generic [ref=f9e350]: 리테일 플랫폼
+    - generic [ref=f9e216]:
+      - heading "수만 명의 목소리가 당신의 제품에 대해 뭐라고 말하는지, 궁금하지 않으세요?" [level=2] [ref=f9e351]
+      - link "대화 시작하기 →" [ref=f9e352] [cursor=pointer]:
+        - /url: mailto:hello@deepinsightlab.example
+        - text: 대화 시작하기
+        - generic [ref=f9e220]: →
+  - contentinfo [ref=f9e221]:
+    - generic [ref=f9e222]:
+      - generic [ref=f9e223]: 딥인사이트랩 — 서울, 대한민국
+      - generic [ref=f9e224]:
+        - link "hello@deepinsightlab.example" [ref=f9e225] [cursor=pointer]:
+          - /url: mailto:hello@deepinsightlab.example
+        - generic [ref=f9e226]: © 2026
+  - button "Open Next.js Dev Tools" [ref=f9e232] [cursor=pointer]
+  - alert [ref=f9e244]
