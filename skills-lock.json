@@ -8,6 +8,18 @@
       "skillPath": ".claude/skills/designing-nextjs-ui/SKILL.md",
       "computedHash": "c65a3257abc211ad7e9b09af126b2aa3ad168ade9d58a98de28672c9ce07b1af"
     },
+    "landing-page-design": {
+      "source": "2389-research/landing-page-design",
+      "sourceType": "github",
+      "skillPath": "skills/SKILL.md",
+      "computedHash": "b1ee9b3fc396f073991d46294eee4e37976e0bfdede92fcfcadb3f6ba8725b4a"
+    },
+    "modern-web-design": {
+      "source": "freshtechbro/claudedesignskills",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/modern-web-design/SKILL.md",
+      "computedHash": "8ad9815a4a43dd5c3b40b3c700ef89f624d451a9e0cc1adea33909a7f22193dd"
+    },
     "responsive-mobile-first": {
       "source": "adi0900/CmcS-Workflow",
       "ref": "main",
