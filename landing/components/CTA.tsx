@@ -22,14 +22,14 @@ export function CTA() {
     const w = window.innerWidth;
     if (w < 640) return; // mobile keeps the static fallback
     const cores = navigator.hardwareConcurrency || 4;
-    const count = w < 1024 ? 260 : cores >= 8 ? 420 : 320;
+    const count = w < 1024 ? 340 : cores >= 8 ? 580 : 440;
     setCanvas({ show: true, count });
   }, [reduce]);
 
   return (
     <section
       id="contact"
-      className="relative overflow-hidden bg-ink py-32 text-paper sm:py-40"
+      className="relative flex min-h-screen flex-col overflow-hidden bg-ink py-24 text-paper"
     >
       {/* static fallback (mobile / reduced motion): a faint condensed band */}
       <div
@@ -53,7 +53,7 @@ export function CTA() {
         </div>
       )}
 
-      <div className="relative z-10 mx-auto max-w-4xl px-6 text-center sm:px-8">
+      <div className="relative z-10 mx-auto max-w-4xl px-6 pt-[10vh] text-center sm:px-8">
         <motion.h2
           initial={reduce ? { opacity: 0 } : { opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}

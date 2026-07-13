@@ -62,8 +62,8 @@ const en = {
     headline: { a: "Guesswork out.", b: "Evidence in." },
     cards: [
       {
-        k: "Weeks → Days",
-        d: "Decisions that waited on gut feeling now rest on traceable evidence.",
+        k: "Weeks → Hours",
+        d: "Decisions that waited on gut feeling now rest on traceable evidence — in hours, not weeks.",
       },
       {
         k: "Two lenses, one picture",
@@ -178,8 +178,8 @@ const ko: typeof en = {
     headline: { a: "감이 아니라,", b: "근거로." },
     cards: [
       {
-        k: "몇 주 → 며칠",
-        d: "감에 기대 몇 주씩 미뤄지던 결정이, 추적 가능한 근거 위에서 며칠 만에 끝납니다.",
+        k: "몇 주 → 몇 시간",
+        d: "감에 기대 몇 주씩 미뤄지던 결정이, 추적 가능한 근거 위에서 몇 시간 만에 끝납니다.",
       },
       {
         k: "두 개의 렌즈, 하나의 그림",

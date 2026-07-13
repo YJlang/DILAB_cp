@@ -23,7 +23,7 @@ export function Hero() {
     const w = window.innerWidth;
     if (w < 640) return; // mobile keeps the calm static fallback
     const cores = navigator.hardwareConcurrency || 4;
-    const count = w < 1024 ? 300 : cores >= 8 ? 520 : 380;
+    const count = w < 1024 ? 380 : cores >= 8 ? 640 : 480;
     setCanvas({ show: true, count });
   }, [reduce]);
 
