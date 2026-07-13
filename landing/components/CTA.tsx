@@ -22,7 +22,7 @@ export function CTA() {
     const w = window.innerWidth;
     if (w < 640) return; // mobile keeps the static fallback
     const cores = navigator.hardwareConcurrency || 4;
-    const count = w < 1024 ? 340 : cores >= 8 ? 580 : 440;
+    const count = w < 1024 ? 680 : cores >= 8 ? 1080 : 860;
     setCanvas({ show: true, count });
   }, [reduce]);
 
