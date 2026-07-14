@@ -25,7 +25,8 @@ export function CTA() {
     const mobile = w < 640;
     let count: number;
     if (mobile) {
-      count = cores <= 4 ? 250 : 320;
+      // same budget as desktop; only weak/old devices (<=4 cores) get trimmed
+      count = cores <= 4 ? 600 : 1080;
     } else {
       count = w < 1024 ? 680 : cores >= 8 ? 1080 : 860;
     }
@@ -59,8 +60,8 @@ export function CTA() {
             count={canvas.count}
             variant="cta"
             isMobile={canvas.mobile}
-            dpr={canvas.mobile ? [1, 1.5] : [1, 1.8]}
-            paperRatio={canvas.mobile ? 0.04 : 0.07}
+            dpr={canvas.mobile ? [1, 2] : [1, 1.8]}
+            paperRatio={0.07}
           />
         </div>
       )}
