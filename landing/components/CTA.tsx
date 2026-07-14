@@ -12,18 +12,24 @@ const EASE = [0.22, 1, 0.36, 1] as const;
 export function CTA() {
   const reduce = useReducedMotion();
   const { t } = useLang();
-  const [canvas, setCanvas] = useState<{ show: boolean; count: number }>({
-    show: false,
-    count: 0,
-  });
+  const [canvas, setCanvas] = useState<{
+    show: boolean;
+    count: number;
+    mobile: boolean;
+  }>({ show: false, count: 0, mobile: false });
 
   useEffect(() => {
-    if (reduce) return;
+    if (reduce) return; // reduced-motion keeps the static fallback (a11y)
     const w = window.innerWidth;
-    if (w < 640) return; // mobile keeps the static fallback
     const cores = navigator.hardwareConcurrency || 4;
-    const count = w < 1024 ? 680 : cores >= 8 ? 1080 : 860;
-    setCanvas({ show: true, count });
+    const mobile = w < 640;
+    let count: number;
+    if (mobile) {
+      count = cores <= 4 ? 250 : 320;
+    } else {
+      count = w < 1024 ? 680 : cores >= 8 ? 1080 : 860;
+    }
+    setCanvas({ show: true, count, mobile });
   }, [reduce]);
 
   return (
@@ -49,7 +55,13 @@ export function CTA() {
       {/* the same 3D language as the hero — particles condense into a signal band */}
       {canvas.show && (
         <div className="pointer-events-none absolute inset-0">
-          <ParticleField count={canvas.count} variant="cta" />
+          <ParticleField
+            count={canvas.count}
+            variant="cta"
+            isMobile={canvas.mobile}
+            dpr={canvas.mobile ? [1, 1.5] : [1, 1.8]}
+            paperRatio={canvas.mobile ? 0.04 : 0.07}
+          />
         </div>
       )}
 

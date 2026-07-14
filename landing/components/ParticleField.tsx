@@ -24,13 +24,31 @@ const FORMATION = {
   cta: { width: 8.0, centerX: 0, centerY: -1.7, safeX: 0, safeY: 4 },
 } as const;
 
+// Camera is at z=7.5, fov=55 → this is the visible world height at the z≈0
+// plane where the wordmark forms. Used to size the mobile (portrait) formation.
+const VIS_H = 2 * 7.5 * Math.tan(((55 * Math.PI) / 180) / 2);
+
+type Formation = { width: number; centerX: number; centerY: number; safeX: number; safeY: number };
+
+// On a narrow portrait screen the right-margin desktop layout would clip the
+// wordmark, so mobile centers it and sizes it to ~85% of the visible width so
+// every glyph reads. Placed in the lower band, clear of the centered headline.
+function getFormation(variant: Variant, isMobile: boolean, aspect: number): Formation {
+  if (!isMobile) return FORMATION[variant];
+  const width = VIS_H * aspect * 0.85;
+  if (variant === "hero") {
+    return { width, centerX: 0, centerY: -2.3, safeX: 0, safeY: 1.3 };
+  }
+  return { width, centerX: 0, centerY: -1.25, safeX: 0, safeY: 3 };
+}
+
 // Auto-formation timing (seconds) — Antigravity-style self-assembly.
 const HERO_START = 3.0;
 const HERO_DURATION = 3.6;
 
 // particle size when locked into a glyph — small + uniform so serifs read
 const FORM_SCALE = 0.02;
-const PAPER_RATIO = 0.07;
+const DEFAULT_PAPER_RATIO = 0.07;
 
 const smoothstep = (x: number) => x * x * (3 - 2 * x);
 
@@ -147,26 +165,68 @@ function flow(x: number, y: number, z: number, t: number, phase: number) {
   };
 }
 
-function Swarm({ count, variant }: { count: number; variant: Variant }) {
+function Swarm({
+  count,
+  variant,
+  isMobile,
+  paperRatio,
+}: {
+  count: number;
+  variant: Variant;
+  isMobile: boolean;
+  paperRatio: number;
+}) {
   const sphereRef = useRef<THREE.InstancedMesh>(null);
   const paperRef = useRef<THREE.InstancedMesh>(null);
   const mouse = useRef({ x: 0, y: 0, tx: 0, ty: 0 });
   const formation = useRef<Float32Array | null>(null);
   const { camera, gl } = useThree();
 
-  const paperCount = Math.max(1, Math.round(count * PAPER_RATIO));
+  const paperCount = Math.max(1, Math.round(count * paperRatio));
   const sphereCount = count - paperCount;
-  const conf = FORMATION[variant];
+
+  // conf drives both the wordmark placement and the text safe-zone; it is
+  // recomputed with the live aspect ratio (mobile portrait sizing).
+  const confRef = useRef<Formation>(
+    getFormation(
+      variant,
+      isMobile,
+      typeof window !== "undefined"
+        ? window.innerWidth / window.innerHeight
+        : 1,
+    ),
+  );
+
+  // adaptive draw budget — trimmed once if the first ~1s runs below ~38fps
+  const activeCount = useRef(count);
+  const perf = useRef({ frames: 0, acc: 0, done: false });
 
   const data = useMemo(() => buildData(count, paperCount), [count, paperCount]);
+
+  useEffect(() => {
+    activeCount.current = count;
+    perf.current = { frames: 0, acc: 0, done: false };
+  }, [count]);
 
   useEffect(() => {
     const onMove = (e: MouseEvent) => {
       mouse.current.tx = (e.clientX / window.innerWidth) * 2 - 1;
       mouse.current.ty = -((e.clientY / window.innerHeight) * 2 - 1);
     };
+    // touch feeds the exact same parallax channel; passive so it never blocks
+    // the page scroll gesture (no preventDefault).
+    const onTouch = (e: TouchEvent) => {
+      const tch = e.touches[0];
+      if (!tch) return;
+      mouse.current.tx = (tch.clientX / window.innerWidth) * 2 - 1;
+      mouse.current.ty = -((tch.clientY / window.innerHeight) * 2 - 1);
+    };
     window.addEventListener("mousemove", onMove, { passive: true });
-    return () => window.removeEventListener("mousemove", onMove);
+    window.addEventListener("touchmove", onTouch, { passive: true });
+    return () => {
+      window.removeEventListener("mousemove", onMove);
+      window.removeEventListener("touchmove", onTouch);
+    };
   }, []);
 
   // build the "DILAB" formation targets once fonts are ready (+ on resize)
@@ -184,6 +244,12 @@ function Swarm({ count, variant }: { count: number; variant: Variant }) {
         .getPropertyValue("--font-fraunces")
         .trim();
       const family = `${fraunces || '"Fraunces"'}, Georgia, "Times New Roman", serif`;
+      const conf = getFormation(
+        variant,
+        isMobile,
+        window.innerWidth / window.innerHeight,
+      );
+      confRef.current = conf;
       formation.current = sampleWordTargets(count, family, conf);
     };
     compute();
@@ -197,15 +263,33 @@ function Swarm({ count, variant }: { count: number; variant: Variant }) {
       clearTimeout(debounce);
       window.removeEventListener("resize", onResize);
     };
-  }, [count, conf]);
+  }, [count, variant, isMobile]);
 
-  useFrame((state) => {
+  useFrame((state, delta) => {
     const spheres = sphereRef.current;
     const papers = paperRef.current;
     if (!spheres || !papers) return;
 
+    // sample early frames; if the device can't hold ~38fps, trim the budget once
+    if (isMobile && !perf.current.done) {
+      const p = perf.current;
+      p.frames++;
+      if (p.frames > 15) {
+        p.acc += delta;
+        if (p.frames >= 60) {
+          const avg = p.acc / (p.frames - 15);
+          if (avg > 0.026) {
+            activeCount.current = Math.max(200, Math.floor(count * 0.6));
+          }
+          p.done = true;
+        }
+      }
+    }
+    const active = activeCount.current;
+
     const t = state.clock.elapsedTime;
     const targets = formation.current;
+    const conf = confRef.current;
 
     const rect = gl.domElement.getBoundingClientRect();
     const vh = window.innerHeight || 800;
@@ -236,7 +320,7 @@ function Swarm({ count, variant }: { count: number; variant: Variant }) {
     let pi = 0;
     let feSum = 0;
 
-    for (let i = 0; i < count; i++) {
+    for (let i = 0; i < active; i++) {
       const d = data[i];
 
       // per-particle staggered ease → organic, seeping assembly
@@ -311,12 +395,15 @@ function Swarm({ count, variant }: { count: number; variant: Variant }) {
       }
     }
 
+    // draw only what we filled (adaptive budget may be < allocated)
+    spheres.count = si;
+    papers.count = pi;
     spheres.instanceMatrix.needsUpdate = true;
     papers.instanceMatrix.needsUpdate = true;
     if (spheres.instanceColor) spheres.instanceColor.needsUpdate = true;
     if (papers.instanceColor) papers.instanceColor.needsUpdate = true;
 
-    const avgFe = feSum / count;
+    const avgFe = feSum / Math.max(1, active);
     // background recedes; the wordmark surfaces
     const globalOpacity =
       variant === "hero" ? 0.42 + avgFe * 0.5 : 0.16 + avgFe * 0.62;
@@ -355,18 +442,29 @@ function Swarm({ count, variant }: { count: number; variant: Variant }) {
 export default function ParticleField({
   count = 800,
   variant = "hero",
+  dpr = [1, 1.8],
+  paperRatio = DEFAULT_PAPER_RATIO,
+  isMobile = false,
 }: {
   count?: number;
   variant?: Variant;
+  dpr?: [number, number];
+  paperRatio?: number;
+  isMobile?: boolean;
 }) {
   return (
     <Canvas
-      dpr={[1, 1.8]}
+      dpr={dpr}
       camera={{ position: [0, 0, 7.5], fov: 55 }}
       gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
       style={{ position: "absolute", inset: 0 }}
     >
-      <Swarm count={count} variant={variant} />
+      <Swarm
+        count={count}
+        variant={variant}
+        isMobile={isMobile}
+        paperRatio={paperRatio}
+      />
     </Canvas>
   );
 }

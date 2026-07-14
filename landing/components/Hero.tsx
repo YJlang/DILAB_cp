@@ -13,18 +13,25 @@ const EASE = [0.22, 1, 0.36, 1] as const;
 export function Hero() {
   const reduce = useReducedMotion();
   const { t } = useLang();
-  const [canvas, setCanvas] = useState<{ show: boolean; count: number }>({
-    show: false,
-    count: 0,
-  });
+  const [canvas, setCanvas] = useState<{
+    show: boolean;
+    count: number;
+    mobile: boolean;
+  }>({ show: false, count: 0, mobile: false });
 
   useEffect(() => {
-    if (reduce) return;
+    if (reduce) return; // reduced-motion keeps the static fallback (a11y)
     const w = window.innerWidth;
-    if (w < 640) return; // mobile keeps the calm static fallback
     const cores = navigator.hardwareConcurrency || 4;
-    const count = w < 1024 ? 760 : cores >= 8 ? 1200 : 960;
-    setCanvas({ show: true, count });
+    const mobile = w < 640;
+    let count: number;
+    if (mobile) {
+      // lite 3D on phones; weak devices (<=4 cores) get a smaller budget
+      count = cores <= 4 ? 250 : 420;
+    } else {
+      count = w < 1024 ? 760 : cores >= 8 ? 1200 : 960;
+    }
+    setCanvas({ show: true, count, mobile });
   }, [reduce]);
 
   return (
@@ -50,7 +57,12 @@ export function Hero() {
       {/* Live particle field — noise that begins to align as you scroll */}
       {canvas.show && (
         <div className="pointer-events-none absolute inset-0">
-          <ParticleField count={canvas.count} />
+          <ParticleField
+            count={canvas.count}
+            isMobile={canvas.mobile}
+            dpr={canvas.mobile ? [1, 1.5] : [1, 1.8]}
+            paperRatio={canvas.mobile ? 0.04 : 0.07}
+          />
         </div>
       )}
 
