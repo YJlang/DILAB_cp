@@ -16,12 +16,14 @@ const PAPER = new THREE.Color("#faf7f2");
 const AMBER = new THREE.Color("#c77b3f");
 const DARK = new THREE.Color("#221f1b");
 
-// Where the "DILAB" wordmark forms, per variant (world units).
+// Where the "DILLAB" wordmark forms, per variant (world units).
 // hero forms it in the clear right-hand margin so it never fights the
 // left-aligned headline; cta forms it large and low, on the dark stage.
+// Widths are sized for the 6-glyph wordmark so each letter — especially
+// the L·L pair — still reads at a glance.
 const FORMATION = {
-  hero: { width: 5.0, centerX: 3.0, centerY: -0.2, safeX: -3, safeY: 1.5 },
-  cta: { width: 8.0, centerX: 0, centerY: -1.7, safeX: 0, safeY: 4 },
+  hero: { width: 5.3, centerX: 3.0, centerY: -0.2, safeX: -3, safeY: 1.5 },
+  cta: { width: 8.5, centerX: 0, centerY: -1.7, safeX: 0, safeY: 4 },
 } as const;
 
 // Camera is at z=7.5, fov=55 → this is the visible world height at the z≈0
@@ -31,11 +33,12 @@ const VIS_H = 2 * 7.5 * Math.tan(((55 * Math.PI) / 180) / 2);
 type Formation = { width: number; centerX: number; centerY: number; safeX: number; safeY: number };
 
 // On a narrow portrait screen the right-margin desktop layout would clip the
-// wordmark, so mobile centers it and sizes it to ~85% of the visible width so
-// every glyph reads. Placed in the lower band, clear of the centered headline.
+// wordmark, so mobile centers it and sizes it to ~90% of the visible width so
+// every one of the 6 glyphs still reads. Placed in the lower band, clear of
+// the centered headline.
 function getFormation(variant: Variant, isMobile: boolean, aspect: number): Formation {
   if (!isMobile) return FORMATION[variant];
-  const width = VIS_H * aspect * 0.85;
+  const width = VIS_H * aspect * 0.9;
   if (variant === "hero") {
     return { width, centerX: 0, centerY: -2.3, safeX: 0, safeY: 1.3 };
   }
@@ -90,8 +93,14 @@ function buildData(count: number, paperCount: number) {
   return data;
 }
 
+const WORDMARK = "DILLAB";
+// Explicit tracking (px, at fontPx) between every glyph pair. Browser kerning
+// alone can let the L·L pair sit close enough to read as a single "U" once
+// downsampled into particles — a fixed gap guarantees six distinct letters.
+const LETTER_TRACKING_RATIO = 0.065;
+
 /**
- * Render "DILAB", sample its opaque pixels densely, and map `count` of them
+ * Render "DILLAB", sample its opaque pixels densely, and map `count` of them
  * into a flat (near-plane) world-space wordmark. Runs once (and on resize).
  */
 function sampleWordTargets(
@@ -100,9 +109,13 @@ function sampleWordTargets(
   opts: { width: number; centerX: number; centerY: number },
 ): Float32Array {
   const fontPx = 360;
+  const tracking = fontPx * LETTER_TRACKING_RATIO;
   const probe = document.createElement("canvas").getContext("2d")!;
   probe.font = `800 ${fontPx}px ${fontFamily}`;
-  const textW = probe.measureText("DILAB").width;
+  const glyphs = WORDMARK.split("");
+  const glyphWidths = glyphs.map((ch) => probe.measureText(ch).width);
+  const textW =
+    glyphWidths.reduce((a, b) => a + b, 0) + tracking * (glyphs.length - 1);
 
   const padX = fontPx * 0.1;
   const canvas = document.createElement("canvas");
@@ -110,10 +123,15 @@ function sampleWordTargets(
   canvas.height = Math.ceil(fontPx * 1.35);
   const ctx = canvas.getContext("2d")!;
   ctx.font = `800 ${fontPx}px ${fontFamily}`;
-  ctx.textAlign = "center";
+  ctx.textAlign = "left";
   ctx.textBaseline = "middle";
   ctx.fillStyle = "#fff";
-  ctx.fillText("DILAB", canvas.width / 2, canvas.height / 2);
+  let penX = (canvas.width - textW) / 2;
+  const midY = canvas.height / 2;
+  for (let i = 0; i < glyphs.length; i++) {
+    ctx.fillText(glyphs[i], penX, midY);
+    penX += glyphWidths[i] + tracking;
+  }
 
   const { data: pix } = ctx.getImageData(0, 0, canvas.width, canvas.height);
   const cands: number[] = []; // packed x,y pairs
@@ -229,7 +247,7 @@ function Swarm({
     };
   }, []);
 
-  // build the "DILAB" formation targets once fonts are ready (+ on resize)
+  // build the "DILLAB" formation targets once fonts are ready (+ on resize)
   useEffect(() => {
     let active = true;
     let debounce: ReturnType<typeof setTimeout>;

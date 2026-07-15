@@ -83,7 +83,7 @@ const en = {
   evidence: {
     eyebrow: "04 — Evidence-first",
     headline: { a: "Don’t take our word for it.", b: "Take theirs." },
-    body: "Our platform, DILAB, scores products on five axes — and every score unfolds into the real sentences behind it.",
+    body: "Our platform, DILLAB, scores products on five axes — and every score unfolds into the real sentences behind it.",
     hintHover: "Hover the card",
     hintTap: "Tap the card",
     hintRest: " to reveal the proof",
@@ -199,7 +199,7 @@ const ko: typeof en = {
   evidence: {
     eyebrow: "04 — 근거 우선",
     headline: { a: "저희 말은 믿지 마세요.", b: "그들의 말을 믿으세요." },
-    body: "저희 플랫폼 DILAB은 제품을 다섯 가지 축으로 평가하고, 모든 점수는 그 뒤에 있는 실제 문장으로 펼쳐집니다.",
+    body: "저희 플랫폼 DILLAB은 제품을 다섯 가지 축으로 평가하고, 모든 점수는 그 뒤에 있는 실제 문장으로 펼쳐집니다.",
     hintHover: "카드에 올려보세요",
     hintTap: "카드를 눌러보세요",
     hintRest: " 근거가 드러납니다",
