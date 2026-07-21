@@ -12,7 +12,13 @@ const EASE = [0.22, 1, 0.36, 1] as const;
 
 export function Hero() {
   const reduce = useReducedMotion();
-  const { t } = useLang();
+  const { t, lang } = useLang();
+  // Hangul glyphs are full-width squares — at the EN size the KO headline grows
+  // ~40% wider per character and collides with the DILLAB wordmark that forms
+  // in the clear right-hand margin. KO gets a smaller scale + an explicit break
+  // before the accent so the block stays inside the left column (and avoids an
+  // orphaned "답." line).
+  const ko = lang === "ko";
   const [canvas, setCanvas] = useState<{
     show: boolean;
     count: number;
@@ -92,11 +98,16 @@ export function Hero() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.9, delay: 0.12, ease: EASE }}
             className="headline"
-            style={{ fontSize: "clamp(2.9rem, 8.4vw, 6.6rem)" }}
+            style={{
+              fontSize: ko
+                ? "clamp(2.2rem, 6.2vw, 4.6rem)"
+                : "clamp(2.9rem, 8.4vw, 6.6rem)",
+            }}
           >
             {t.hero.headline.line1}
             <br />
             {t.hero.headline.pre}
+            {ko && <br />}
             <span className="italic text-amber">{t.hero.headline.accent}</span>
             {t.hero.headline.post}
           </motion.h1>
