@@ -1,0 +1,539 @@
+"""PyGeek 2026 구두발표 슬라이드 생성 (한국어).
+
+발표: 2026-08-20(목) 14:10~14:30 · Oral Presentation #1 · 홍익대
+20분에 질의응답이 포함되므로 발표는 15분 안쪽. 슬라이드 13장.
+
+INC Lab 주간보고 템플릿(`docs/reference/template.pptx`)의 서식을 물려받는다.
+템플릿의 장식 도형(배경·좌상단 파란 사각형·하단 회색바·페이지번호 박스)을
+그대로 복제하고 본문만 새로 얹는다. 레이아웃 placeholder 를 쓰지 않는 이유는
+템플릿 자체가 placeholder 없이 TextBox 로만 구성돼 있기 때문이다.
+
+중앙대 로고는 넣지 않는다 — 저자 소속이 3개 기관이라 한 곳의 로고만 넣는 것은
+맞지 않는다.
+
+⚠️ 산학 비밀유지: 서비스 실명(DILAB·딥인사이트랩)을 쓰지 않는다.
+   논문과 같은 익명 서술(`국내 제품 리뷰 분석 서비스`)만 사용한다.
+   발표자료는 Proceedings 수록 예정이므로 공개물 전제로 작성한다.
+"""
+
+from copy import deepcopy
+from pathlib import Path
+
+from pptx import Presentation
+from pptx.dml.color import RGBColor
+from pptx.enum.text import MSO_ANCHOR, PP_ALIGN
+from pptx.util import Cm, Emu, Pt
+
+ROOT = Path(__file__).resolve().parents[3]
+TEMPLATE = ROOT / "docs/reference/template.pptx"
+FIGDIR = ROOT / "docs/figures"
+OUT = Path(__file__).resolve().parent / "PyGeek2026_발표_윤준하.pptx"
+
+FONT = "맑은 고딕"
+INK = RGBColor(0x00, 0x00, 0x00)
+BLUE = RGBColor(0x33, 0x75, 0xBE)
+GREY = RGBColor(0x82, 0x7E, 0x7F)
+RED = RGBColor(0xF9, 0x41, 0x45)
+DIM = RGBColor(0x5A, 0x5A, 0x5A)
+FILL = RGBColor(0xF1, 0xF1, 0xF1)
+
+# 본문 안전 영역 — 템플릿 실측 (제목 0.32", 하단 회색바 7.08")
+BODY_L, BODY_T, BODY_W = 0.78, 1.15, 11.29
+BODY_B = 6.85                      # 회색바(7.08")에서 0.23" 띄운다
+BODY_H = BODY_B - BODY_T
+
+
+def inch(v):
+    return Emu(int(v * 914400))
+
+
+# ==========================================================================
+# 슬라이드 내용
+# ==========================================================================
+TITLE_EN = ("A Factor Decomposition Method for Separating\n"
+            "Store Substitution and Embedding Placement Effects\n"
+            "in Vector Database Migration")
+TITLE_KO = "벡터 데이터베이스 이전에서 저장소 교체와 임베딩 위치 효과의 분리"
+
+SLIDES = [
+    # ---- 2. 한 장 요약 ---------------------------------------------------
+    dict(title="At a Glance", body=[
+        ("q", "Quality changed after the migration. Which change caused it?"),
+        ("s", ""),
+        ("h", "Problem"),
+        ("b", "Migrating the vector layer changes the store and the embedding "
+              "placement at the same time"),
+        ("b", "A single before-and-after comparison cannot tell which factor is responsible"),
+        ("s", ""),
+        ("h", "Proposal"),
+        ("b", "Insert one intermediate condition — a bridge condition — so that "
+              "one comparison splits into two"),
+        ("b", "It needs no re-embedding, so it is inexpensive and leaves the "
+              "running service untouched"),
+        ("s", ""),
+        ("h", "Result"),
+        ("b", "No quality change was detected for the store substitution; virtually all "
+              "of the observed change came from the embedding placement"),
+    ]),
+
+    # ---- 3. 배경 ---------------------------------------------------------
+    dict(title="Background · The Vector Layer Changes Most Often", body=[
+        ("h", "Three components of a RAG system"),
+        ("b", "Embedding model — turns queries and documents into vectors"),
+        ("b", "Store — indexes and searches those vectors"),
+        ("b", "Language model — generates an answer grounded in the retrieved evidence"),
+        ("s", ""),
+        ("h", "A representative migration path"),
+        ("b", "General-purpose relational database with a vector extension  →  "
+              "converged database with a vector type and an inference runtime inside it"),
+        ("b", "That is, the database itself performs the embedding computation"),
+        ("s", ""),
+        ("n", "The effect of such a migration is usually assessed by an end-to-end "
+              "comparison before and after the change."),
+    ]),
+
+    # ---- 4. 문제 ---------------------------------------------------------
+    dict(title="Problem · Two Things Change at Once", body=[
+        ("h", "Two factors folded into a single migration"),
+        ("b", "Store — the engine that holds the vectors and its indexing method "
+              "(approximate or exact search)"),
+        ("b", "Placement — whether the embedding is computed outside or inside the database"),
+        ("s", ""),
+        ("h", "They change together for a reason"),
+        ("b", "A migration motivated by governance prefers to move the embedding inside as well"),
+        ("b", "A database that hosts a model imposes a model size limit, so moving the "
+              "placement drags the model capacity along with it"),
+        ("s", ""),
+        ("q", "The end-to-end difference alone cannot point to the factor that caused the change"),
+    ]),
+
+    # ---- 5. 오진단 -------------------------------------------------------
+    dict(title="Why It Matters · The Cause Gets Misdiagnosed", body=[
+        ("h", "When quality drops"),
+        ("b", "It cannot be told apart whether the store or the model is at fault"),
+        ("s", ""),
+        ("h", "When nothing changes"),
+        ("b", "It cannot be known whether there was truly no effect, or the two "
+              "factors cancelled each other out"),
+        ("s", ""),
+        ("h", "So the remedy misses"),
+        ("b", "Blaming the store and reverting it does not bring the quality back"),
+        ("b", "The conclusion cannot be carried over to an environment with a different "
+              "instance class or model size limit"),
+    ]),
+
+    # ---- 6. 제안 (그림) --------------------------------------------------
+    dict(title="Proposal · A Bridge Condition Separates the Factors",
+         image="slide-fig-decomposition-en.png",
+         body=[
+             ("b", "Load the target store with the vectors the source system has "
+                   "already produced — that is condition B"),
+             ("b", "A→B differs only in the store, B→C only in the placement — "
+                   "one factor at a time"),
+         ]),
+
+    # ---- 7. 시스템 구조 (그림) ------------------------------------------
+    dict(title="System Architecture · What Actually Changes",
+         image="slide-fig-arch-en.png",
+         body=[
+             ("n", "The retrieval rule (vector similarity + metadata filters + source-based "
+                   "prioritization) and its parameters were kept identical across the "
+                   "three conditions."),
+         ]),
+
+    # ---- 8. 실험 설계 (표) ----------------------------------------------
+    dict(title="Experimental Setup", table=dict(
+        header=["", "A · baseline", "B · bridge", "C · migrated"],
+        rows=[
+            ["Store", "PostgreSQL + pgvector", "Oracle 26ai", "Oracle 26ai"],
+            ["Embedding model", "BGE-M3 (1024)", "BGE-M3 (1024)", "e5-small (384)"],
+            ["Placement", "external", "external", "in-database"],
+            ["Vector search", "HNSW approx.", "exact", "exact"],
+        ]), body=[
+        ("h", "Corpus and metrics"),
+        ("b", "1,347 review chunks from a Korean product-review service in production · "
+              "43 fixed queries"),
+        ("b", "Retrieval agreement (Jaccard · Spearman · Recall@10) / evidence relevance "
+              "(0–2 scale) / search latency"),
+        ("n", "Confidence intervals from 10,000 bootstrap resamples. The target database "
+              "ran on the lowest-tier free instance."),
+    ]),
+
+    # ---- 9. 결과 ① -------------------------------------------------------
+    dict(title="Result ① Store Factor · No Effect Detected",
+         stats=[("Top-10 Jaccard", "0.971", "[0.946, 0.992]"),
+                ("Relevance difference", "−0.042", "p = 0.523"),
+                ("Effect size dz", "−0.098", "negligible")],
+         body=[
+             ("b", "Loaded with identical vectors, the two stores returned exactly the same "
+                   "top-10 set for 37 of the 43 queries"),
+             ("b", "What the baseline missed because of its approximate index amounts to "
+                   "about 1.6%"),
+             ("b", "A Wilcoxon test on the queries that remain after excluding ties leads "
+                   "to the same conclusion (p = 0.908)"),
+         ]),
+
+    # ---- 10. 결과 ② ------------------------------------------------------
+    dict(title="Result ② Placement Factor · Significant, Medium-Sized",
+         stats=[("Top-10 Jaccard", "0.175", "[0.133, 0.221]"),
+                ("Relevance score", "1.270 → 1.014", "p = 0.003"),
+                ("Effect size dz", "0.473", "medium")],
+         body=[
+             ("b", "Same store and same search method, yet mostly different evidence is "
+                   "retrieved for the same query"),
+             ("b", "Since no store effect was detected from A to B, virtually all of the "
+                   "quality change is due to the placement factor and the model size limit "
+                   "that comes with it"),
+             ("b", "Had only an end-to-end comparison been performed, the 20% drop in "
+                   "relevance would have been blamed on the store — and reverting the store "
+                   "would not bring the quality back"),
+         ]),
+
+    # ---- 11. 정직한 보고 -------------------------------------------------
+    dict(title="But · Claiming “No Difference” Needs Its Own Test", body=[
+        ("h", "A non-significant p value is not evidence of equivalence"),
+        ("b", "We ran equivalence tests (TOST) separately over a ±0.15 point range"),
+        ("b", "The result was p = 0.052 — the lower bound of the confidence interval, "
+              "−0.172, falls outside the range, so the significance level was not met"),
+        ("s", ""),
+        ("h", "So we report it this way"),
+        ("b", "Not “equivalence has been established”, but “no effect was detected and "
+              "its magnitude is bounded to a small range”"),
+        ("b", "The direction in which the interval extends is the one where the target store "
+              "scores higher, so there is no basis for concluding that substituting the "
+              "store degraded quality"),
+    ]),
+
+    # ---- 12. 결론 --------------------------------------------------------
+    dict(title="Conclusion", body=[
+        ("h", "Method"),
+        ("b", "Adding a single bridge condition splits an end-to-end comparison into two "
+              "single-factor comparisons"),
+        ("s", ""),
+        ("h", "What we observed in this service"),
+        ("b", "No effect of the store factor was detected; the entire observed change "
+              "originated from the placement factor"),
+        ("b", "Changing the placement is a trade in governance rather than in performance"),
+        ("s", ""),
+        ("h", "A practical decision rule"),
+        ("b", "If governance of the stored data is the only goal → replacing the store "
+              "alone is enough"),
+        ("b", "If the query path must also stay inside the boundary → first confirm that "
+              "the largest model that can be hosted is sufficient for that domain"),
+        ("q", "The bridge condition makes that confirmation possible before the migration"),
+    ]),
+
+    # ---- 13. 한계 --------------------------------------------------------
+    dict(title="Limitations and Future Work", body=[
+        ("h", "Limitations"),
+        ("b", "A single Korean corpus of 1,347 chunks from one product domain"),
+        ("b", "Human assessors were not involved in the relevance scoring"),
+        ("b", "Measurements were taken on an entry-level instance — the latency figures "
+              "cannot be generalized to higher-tier hardware"),
+        ("b", "Placement and model size are coupled by construction, and the store result "
+              "does not establish equivalence"),
+        ("s", ""),
+        ("h", "Future work"),
+        ("b", "A fourth condition that runs the smaller model outside the database would "
+              "separate placement from model size"),
+        ("s", ""),
+        ("q", "Thank you"),
+    ]),
+]
+
+
+# ==========================================================================
+# 렌더링
+# ==========================================================================
+def run(par, text, *, size, bold=False, color=INK, space_before=0, space_after=0):
+    par.space_before = Pt(space_before)
+    par.space_after = Pt(space_after)
+    r = par.add_run()
+    r.text = text
+    f = r.font
+    f.name = FONT
+    f.size = Pt(size)
+    f.bold = bold
+    f.color.rgb = color
+    # 한글이 라틴 글꼴로 떨어지지 않도록 eastAsia 를 명시한다
+    rPr = r._r.get_or_add_rPr()
+    from pptx.oxml.ns import qn
+    ea = rPr.find(qn("a:ea"))
+    if ea is None:
+        ea = rPr.makeelement(qn("a:ea"), {})
+        rPr.append(ea)
+    ea.set("typeface", FONT)
+    return r
+
+
+def textbox(slide, l, t, w, h):
+    tb = slide.shapes.add_textbox(inch(l), inch(t), inch(w), inch(h))
+    tf = tb.text_frame
+    tf.word_wrap = True
+    tf.margin_left = tf.margin_right = 0
+    tf.margin_top = tf.margin_bottom = 0
+    return tb, tf
+
+
+def build():
+    prs = Presentation(str(TEMPLATE))
+
+    # 템플릿 slide2 에서 장식 도형만 떠 온다 (배경/파란사각형/회색바/페이지번호)
+    src = prs.slides[1]
+    deco = [sh for sh in src.shapes if not sh.has_text_frame or not sh.text_frame.text.strip()
+            or sh.text_frame.text.strip() == "2"]
+    deco_xml = [deepcopy(sh._element) for sh in deco]
+    blank_layout = src.slide_layout
+
+    # 표지(slide1)만 남기고 나머지 제거
+    xml_slides = prs.slides._sldIdLst
+    for sld in list(xml_slides)[1:]:
+        rId = sld.get("{http://schemas.openxmlformats.org/officeDocument/2006/relationships}id")
+        prs.part.drop_rel(rId)
+        xml_slides.remove(sld)
+
+    # ---------- 표지 ----------
+    cover = prs.slides[0]
+    for sh in list(cover.shapes):
+        if sh.shape_type == 13:                      # PICTURE — 중앙대 로고 제거
+            sh._element.getparent().remove(sh._element)
+        elif sh.has_text_frame and sh.text_frame.text.strip():
+            sh._element.getparent().remove(sh._element)
+        elif sh.name.startswith("직선"):
+            # 템플릿의 밑줄은 한 줄짜리 제목 기준이라 여러 줄 제목을 관통한다.
+            # 제목 아래로 내리고 폭도 제목에 맞춘다.
+            sh.left, sh.top, sh.width = inch(2.60), inch(3.42), inch(8.13)
+
+    _, tf = textbox(cover, 0.90, 1.62, 11.53, 1.9)
+    for i, ln in enumerate(TITLE_EN.split("\n")):
+        p = tf.paragraphs[0] if i == 0 else tf.add_paragraph()
+        p.alignment = PP_ALIGN.CENTER
+        p.line_spacing = 1.18
+        run(p, ln, size=27, bold=True)
+
+    _, tf = textbox(cover, 1.20, 3.70, 10.93, 0.6)
+    p = tf.paragraphs[0]
+    p.alignment = PP_ALIGN.CENTER
+    run(p, TITLE_KO, size=13, color=GREY)
+
+    _, tf = textbox(cover, 1.20, 4.72, 10.93, 2.0)
+    meta = [("2026 International Conference on PyGeek", 15, True, INK),
+            ("August 20, 2026  ·  Hongik University, Seoul", 14, False, DIM),
+            ("", 8, False, DIM),
+            ("Junha Yoon · Ohhyeon Gwon · Junhaeng Lee · Hyeji Roh · "
+             "Soowan Cho · Suhee Kim · SangSoon Lim", 13, True, INK),
+            ("Sungkyul University · Chung-Ang University · Deep Insight Lab", 12, False, GREY)]
+    for i, (txt, sz, bd, col) in enumerate(meta):
+        p = tf.paragraphs[0] if i == 0 else tf.add_paragraph()
+        p.alignment = PP_ALIGN.CENTER
+        run(p, txt, size=sz, bold=bd, color=col, space_after=7)
+
+    # ---------- 내용 슬라이드 ----------
+    for idx, spec in enumerate(SLIDES, start=2):
+        s = prs.slides.add_slide(blank_layout)
+        for ph in list(s.placeholders):
+            ph._element.getparent().remove(ph._element)
+        for el in deco_xml:
+            s.shapes._spTree.append(deepcopy(el))
+        # 페이지 번호 갱신
+        for sh in s.shapes:
+            if sh.has_text_frame and sh.text_frame.text.strip() == "2":
+                sh.text_frame.paragraphs[0].runs[0].text = str(idx)
+
+        # 제목
+        _, tf = textbox(s, BODY_L - 0.04, 0.30, BODY_W, 0.55)
+        tf.vertical_anchor = MSO_ANCHOR.MIDDLE
+        run(tf.paragraphs[0], spec["title"], size=24, bold=True)
+
+        # 한국어 리드 — 슬라이드는 영문이지만 발표는 한국어로 한다.
+        # 이 한 줄만 보고도 무슨 말을 할지 떠오르게 하는 것이 목적이다.
+        top = BODY_T
+        if spec.get("lead"):
+            _, tf = textbox(s, BODY_L, 0.94, BODY_W, 0.36)
+            run(tf.paragraphs[0], spec["lead"], size=15, bold=True, color=DIM)
+            top = 1.50
+
+        layout(s, spec, top)
+
+    prs.save(str(OUT))
+    print(f"저장: {OUT.name}  ({len(prs.slides.__iter__.__self__._sldIdLst)}장)")
+
+
+def est_body_height(blocks, size):
+    """본문이 차지할 높이를 인치로 어림한다.
+
+    정확할 필요는 없다. 내용을 안전 영역 안에 앉히고 위아래 여백을 고르게
+    나누는 것이 목적이라, 실제보다 조금 넉넉하게 잡는 편이 안전하다.
+    """
+    from math import ceil
+    # 라틴 문자는 폭이 글자크기의 0.55 배쯤이라 같은 상자에 두 배 가까이 들어간다.
+    # 한글 기준(≈1.0)으로 잡으면 여유가 있는데도 넘친다고 보고 글자를 줄여 버린다.
+    per_line = BODY_W * 72 / (size * 0.56)
+    pts = 0.0
+    for kind, text in blocks:
+        if kind == "s":
+            pts += size * 0.55
+        elif kind == "h":
+            pts += (size + 1) * 1.35 + 7
+        elif kind == "n":
+            pts += (size - 3) * 1.35 + 5
+        elif kind == "q":
+            pts += (size + 3) * 1.35 * max(1, ceil(len(text) / per_line)) + 10
+        else:
+            pts += size * 1.32 * max(1, ceil(len(text) / per_line)) + 4
+    return pts / 72 * 1.08          # 줄바꿈 지점을 정확히 못 맞추므로 8% 여유
+
+
+def layout(slide, spec):
+    """표·카드·그림·본문을 쌓고, 전체 덩어리를 안전 영역 세로 중앙에 앉힌다."""
+    body = spec.get("body")
+    GAP = 0.30
+
+    fixed = 0.0                                  # 그림을 뺀 고정 요소 높이
+    if "table" in spec:
+        fixed += 0.36 * (len(spec["table"]["rows"]) + 1) + GAP
+    if "stats" in spec:
+        fixed += 1.42 + GAP
+
+    # 본문 글자 크기 — 다 들어갈 때까지 한 단계씩 줄인다
+    size, bh = 17, 0.0
+    if body:
+        for size in (17, 16, 15, 14):
+            bh = est_body_height(body, size)
+            if fixed + bh <= BODY_H:
+                break
+
+    if "image" in spec:
+        from PIL import Image
+        png = FIGDIR / spec["image"]
+        iw, ih = Image.open(png).size
+        avail = BODY_H - fixed - (bh + 0.24 if body else 0)
+        w = BODY_W
+        h = w * ih / iw
+        if h > avail:
+            h = avail
+            w = h * iw / ih
+        total = fixed + h + (bh + 0.24 if body else 0)
+    else:
+        total = fixed + bh
+
+    y = BODY_T + max(0.0, (BODY_H - total) / 2)
+
+    if "table" in spec:
+        y = draw_table(slide, spec["table"], y) + GAP
+    if "stats" in spec:
+        y = draw_stats(slide, spec["stats"], y) + GAP
+    if "image" in spec:
+        slide.shapes.add_picture(str(png), inch(BODY_L + (BODY_W - w) / 2),
+                                 inch(y), inch(w), inch(h))
+        y += h + 0.24
+    if body:
+        draw_body(slide, body, y, min(bh + 0.25, BODY_B - y), size=size)
+
+
+def draw_body(slide, blocks, top, height, size=16):
+    _, tf = textbox(slide, BODY_L, top, BODY_W, height)
+    first = True
+    for kind, text in blocks:
+        p = tf.paragraphs[0] if first else tf.add_paragraph()
+        first = False
+        p.line_spacing = 1.28
+        if kind == "s":
+            p.space_after = Pt(2)
+            run(p, "", size=6)
+        elif kind == "h":
+            run(p, text, size=size + 1, bold=True, color=BLUE, space_before=4, space_after=3)
+        elif kind == "b":
+            # 두 줄 이상으로 넘어가는 항목의 둘째 줄이 글머리 아래로 파고들지 않도록
+            # 내어쓰기를 준다.
+            pPr = p._p.get_or_add_pPr()
+            pPr.set("marL", str(int(0.30 * 914400)))
+            pPr.set("indent", str(int(-0.30 * 914400)))
+            run(p, "·  ", size=size, bold=True, color=GREY)
+            run(p, text, size=size)
+            p.space_after = Pt(4)
+        elif kind == "q":
+            run(p, text, size=size + 3, bold=True, color=INK, space_before=6, space_after=4)
+        elif kind == "n":
+            run(p, text, size=size - 3, color=GREY, space_before=5)
+    return tf
+
+
+def draw_stats(slide, stats, top):
+    """큰 숫자 카드 3개를 가로로."""
+    gap, n = 0.26, len(stats)
+    w = (BODY_W - gap * (n - 1)) / n
+    h = 1.42
+    for i, (label, value, sub) in enumerate(stats):
+        x = BODY_L + i * (w + gap)
+        box = slide.shapes.add_shape(1, inch(x), inch(top), inch(w), inch(h))
+        box.fill.solid()
+        box.fill.fore_color.rgb = FILL
+        box.line.color.rgb = RGBColor(0xD5, 0xD5, 0xD5)
+        box.line.width = Pt(1)
+        box.shadow.inherit = False
+        tf = box.text_frame
+        tf.word_wrap = True
+        tf.margin_left = tf.margin_right = inch(0.14)
+        tf.margin_top = inch(0.13)
+        tf.margin_bottom = inch(0.10)
+        p = tf.paragraphs[0]
+        p.alignment = PP_ALIGN.LEFT          # 도형 기본값(가운데)이면 숫자와 어긋난다
+        run(p, label, size=13, bold=True, color=GREY)
+        p = tf.add_paragraph()
+        p.alignment = PP_ALIGN.LEFT
+        run(p, value, size=27, bold=True, color=INK, space_before=2)
+        p = tf.add_paragraph()
+        p.alignment = PP_ALIGN.LEFT
+        run(p, sub, size=12, color=DIM, space_before=2)
+    return top + h
+
+
+def draw_table(slide, spec, top):
+    rows, cols = len(spec["rows"]) + 1, len(spec["header"])
+    h = 0.36 * rows
+    shape = slide.shapes.add_table(rows, cols, inch(BODY_L), inch(top), inch(BODY_W), inch(h))
+    tbl = shape.table
+    tbl.columns[0].width = inch(1.85)
+    for c in range(1, cols):
+        tbl.columns[c].width = inch((BODY_W - 1.85) / (cols - 1))
+    data = [spec["header"]] + spec["rows"]
+    for r, rowvals in enumerate(data):
+        tbl.rows[r].height = inch(0.36)
+        for c, val in enumerate(rowvals):
+            cell = tbl.cell(r, c)
+            cell.margin_left = cell.margin_right = inch(0.10)
+            cell.margin_top = cell.margin_bottom = inch(0.04)
+            cell.vertical_anchor = MSO_ANCHOR.MIDDLE
+            tf = cell.text_frame
+            tf.word_wrap = True
+            p = tf.paragraphs[0]
+            p.alignment = PP_ALIGN.LEFT if c == 0 else PP_ALIGN.CENTER
+            run(p, val, size=14, bold=(r == 0 or c == 0),
+                color=INK if r == 0 else (GREY if c == 0 else INK))
+    return top + h
+
+
+def draw_image(slide, png, top, body):
+    """그림을 폭에 맞춰 넣고, 남는 아래 공간에 설명을 붙인다."""
+    from PIL import Image
+    iw, ih = Image.open(png).size
+    # 설명이 있으면 그만큼 아래를 비워 둔다
+    reserve = 0.0
+    if body:
+        reserve = 0.30 + 0.34 * len([b for b in body if b[0] in ("b", "n", "q")])
+    avail_h = BODY_B - top - reserve
+    w = BODY_W
+    h = w * ih / iw
+    if h > avail_h:
+        h = avail_h
+        w = h * iw / ih
+    x = BODY_L + (BODY_W - w) / 2
+    slide.shapes.add_picture(str(png), inch(x), inch(top), inch(w), inch(h))
+    if body:
+        draw_body(slide, body, top + h + 0.20, BODY_B - (top + h + 0.20), size=15)
+    return top + h
+
+
+if __name__ == "__main__":
+    build()

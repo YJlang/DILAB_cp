@@ -1,0 +1,58 @@
+<!doctype html><html><head><meta charset="utf-8"><style>
+:root{ --ink:#1a1a1a; --grey:#6d6d6d; --line:#c2c2c2; --fill:#f1f1f1;
+       --blue:#3375BE; --bluefill:#eaf1f9; --red:#F94145; --redfill:#fdf0f0; }
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;background:#fff;}
+body{font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased;}
+.stage{width:1720px;background:#fff;}
+.t{font-weight:800;color:var(--ink);}
+.g{color:var(--grey);}
+.cap{font-size:19px;font-weight:600;color:var(--grey);text-align:center;}
+.stage{padding:24px 26px;}</style></head><body><div class="stage">
+<style>
+ .cols{display:flex;gap:44px;}
+ .col{flex:1 1 0;border:2.5px solid var(--ink);background:#fff;padding:16px 20px 18px 20px;}
+ .col.b{border-style:dashed;}
+ .ct{font-size:25px;font-weight:800;color:var(--ink);margin-bottom:4px;}
+ .cq{font-size:18px;font-weight:600;color:var(--grey);margin-bottom:14px;}
+ .obs{border:2.5px solid var(--ink);background:var(--fill);padding:10px 14px;text-align:center;
+      font-size:23px;font-weight:800;color:var(--ink);}
+ .dn{display:flex;justify-content:center;padding:9px 0;}
+ .forks{display:flex;gap:16px;}
+ .fork{flex:1 1 0;border:2px solid var(--line);padding:10px 12px;text-align:center;
+       font-size:20px;font-weight:700;color:var(--grey);background:#fff;}
+ .verdict{margin-top:13px;border:2.5px solid var(--red);background:var(--redfill);
+          padding:10px 14px;text-align:center;font-size:21px;font-weight:800;color:var(--red);}
+ .strip{margin-top:24px;border-top:2.5px solid var(--line);padding-top:16px;text-align:center;}
+ .s1{font-size:25px;font-weight:800;color:var(--ink);}
+ .s2{font-size:20px;font-weight:600;color:var(--grey);margin-top:5px;}
+</style>
+<div class="cols">
+  <div class="col">
+    <div class="ct">When quality drops</div>
+    <div class="cq">the end-to-end comparison shows a decline</div>
+    <div class="obs">relevance falls after the migration</div>
+    <div class="dn"><svg width="20" height="26"><line x1="10" y1="0" x2="10" y2="16" stroke="#1a1a1a" stroke-width="3"/><polygon points="2,15 18,15 10,26" fill="#1a1a1a"/></svg></div>
+    <div class="forks">
+      <div class="fork">the store<br>is at fault?</div>
+      <div class="fork">the model<br>is at fault?</div>
+    </div>
+    <div class="verdict">the two cannot be told apart</div>
+  </div>
+  <div class="col b">
+    <div class="ct">When nothing changes</div>
+    <div class="cq">the end-to-end comparison shows no difference</div>
+    <div class="obs">relevance stays the same</div>
+    <div class="dn"><svg width="20" height="26"><line x1="10" y1="0" x2="10" y2="16" stroke="#1a1a1a" stroke-width="3"/><polygon points="2,15 18,15 10,26" fill="#1a1a1a"/></svg></div>
+    <div class="forks">
+      <div class="fork">there truly was<br>no effect?</div>
+      <div class="fork">two effects<br>cancelled out?</div>
+    </div>
+    <div class="verdict">the two cannot be told apart</div>
+  </div>
+</div>
+<div class="strip">
+  <div class="s1">Blaming the store and reverting it does not bring the quality back</div>
+  <div class="s2">and the conclusion cannot be carried over to a different instance class or model size limit</div>
+</div>
+</div></body></html>

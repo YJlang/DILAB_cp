@@ -1,0 +1,49 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Oracle-based system architecture</title>
+<style>
+  :root{ --ink:#1a1a1a; --grey:#8a8a8a; --grey-mid:#5f5f66; --grey-line:#b7b7b7; --fill:#f0f0f0; }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:#fff;}
+  body{font-family:-apple-system,"Helvetica Neue",Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased;}
+  .stage{ width:800px; height:516px; padding:14px 18px 12px 18px; background:#fff;
+          display:flex; flex-direction:column; }
+  .node{ display:flex; align-items:baseline; gap:10px; border:2px solid var(--ink);
+         background:#fff; padding:7px 12px; }
+  .node-plain{ border:1.5px solid var(--grey-line); }
+  .badge{ width:32px;height:32px;border-radius:50%; flex:0 0 auto; align-self:center;
+          display:flex;align-items:center;justify-content:center;
+          font-size:19px;font-weight:800; border:2px solid var(--ink);color:var(--ink);background:#fff; }
+  .badge-solid{ background:var(--ink); color:#fff; }
+  .t{ font-size:24px; font-weight:700; color:var(--ink); white-space:nowrap; }
+  .t-soft{ font-weight:600; color:var(--grey-mid); }
+  .d{ font-size:19px; color:var(--grey-mid); font-weight:500; }
+  .arrow{ display:flex; align-items:center; justify-content:center; gap:9px; padding:3px 0; }
+  .arrow .lbl{ font-size:17px; font-weight:600; color:var(--grey); letter-spacing:0.02em; }
+  .zone{ border:2.5px dashed var(--ink); background:var(--fill); padding:8px 10px 9px 10px; }
+  .zone-head{ font-size:21px; font-weight:800; color:var(--ink); margin-bottom:7px; }
+  .zone .node{ background:#fff; }
+  .foot{ margin-top:7px; border-top:1.5px solid var(--grey-line); padding-top:7px;
+         font-size:19px; font-weight:600; color:var(--grey-mid); text-align:center; }
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="node node-plain"><div class="t t-soft">User query</div><div class="d">&middot; Korean natural-language question</div></div>
+  <div class="arrow"><svg width="22" height="26" viewBox="0 0 22 26"><line x1="11" y1="0" x2="11" y2="15" stroke="#6d6d6d" stroke-width="3"/><polygon points="4,14 18,14 11,25" fill="#6d6d6d"/></svg></div>
+  <div class="node"><div class="badge">1</div><div class="t">Application server</div><div class="d">&middot; one SQL statement with the query text</div></div>
+  <div class="arrow"><div class="lbl">network boundary (1 of 1)</div><svg width="22" height="26" viewBox="0 0 22 26"><line x1="11" y1="0" x2="11" y2="15" stroke="#1a1a1a" stroke-width="3"/><polygon points="4,14 18,14 11,25" fill="#1a1a1a"/></svg></div>
+  <div class="zone">
+    <div class="zone-head">Oracle AI Database 26ai</div>
+  <div class="node"><div class="badge badge-solid">2</div><div class="t">In-database embedding</div><div class="d">&middot; ONNX runtime, e5-small 384-d</div></div>
+  <div class="arrow"><div class="lbl">query vector</div><svg width="22" height="26" viewBox="0 0 22 26"><line x1="11" y1="0" x2="11" y2="15" stroke="#6d6d6d" stroke-width="3"/><polygon points="4,14 18,14 11,25" fill="#6d6d6d"/></svg></div>
+  <div class="node"><div class="badge badge-solid">3</div><div class="t">Exact vector search</div><div class="d">&middot; VECTOR(384) + filters</div></div>
+  </div>
+  <div class="arrow"><div class="lbl">top-k review chunks</div><svg width="22" height="26" viewBox="0 0 22 26"><line x1="11" y1="0" x2="11" y2="15" stroke="#1a1a1a" stroke-width="3"/><polygon points="4,14 18,14 11,25" fill="#1a1a1a"/></svg></div>
+  <div class="node"><div class="badge">4</div><div class="t">Answer generation (LLM)</div><div class="d">&middot; cites the retrieved chunks</div></div>
+  <div class="foot">1 network boundary &middot; no external model call &middot; embedding and search in one SQL statement</div>
+</div>
+</body>
+</html>

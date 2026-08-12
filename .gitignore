@@ -42,3 +42,9 @@ ewallet.*
 keystore.jks
 truststore.jks
 
+
+# Playwright MCP 스냅샷 (로컬 산출물)
+.playwright-mcp/
+
+# Office 임시 잠금 파일
+~$*

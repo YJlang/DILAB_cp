@@ -1,0 +1,100 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>시스템 구조 비교</title>
+<style>
+  :root{ --ink:#1a1a1a; --grey:#6d6d6d; --line:#c2c2c2; --fill:#f1f1f1; --red:#F94145; }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:#fff;}
+  body{font-family:-apple-system,"Apple SD Gothic Neo","맑은 고딕","Malgun Gothic",sans-serif;
+       -webkit-font-smoothing:antialiased;}
+  .stage{width:1720px;padding:22px 24px 18px 24px;background:#fff;}
+  .cols{display:flex;gap:56px;align-items:stretch;}
+  .col{flex:1 1 0;min-width:0;display:flex;flex-direction:column;}
+
+  .colhead{font-size:26px;font-weight:800;color:var(--ink);margin-bottom:4px;}
+  .colsub{font-size:18px;font-weight:600;color:var(--grey);margin-bottom:14px;}
+
+  .box{border:2.5px solid var(--ink);padding:10px 14px;background:#fff;display:flex;
+       align-items:center;gap:10px;}
+  .box.soft{border:2px solid var(--line);}
+  .num{width:28px;height:28px;border-radius:50%;flex:0 0 auto;background:var(--ink);color:#fff;
+       display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;}
+  .bt{font-size:21px;font-weight:800;color:var(--ink);}
+  .bd{font-size:17px;font-weight:600;color:var(--grey);}
+  .bt.soft{font-weight:700;color:var(--grey);}
+
+  .zone{border:2.5px dashed var(--ink);background:var(--fill);padding:11px 12px 12px 12px;}
+  .zonehead{font-size:19px;font-weight:800;color:var(--ink);margin-bottom:9px;}
+  .zone .box{background:#fff;}
+  .zone .box + .box{margin-top:9px;}
+
+  .arr{display:flex;align-items:center;justify-content:center;gap:9px;padding:5px 0;}
+  .arr .lbl{font-size:16px;font-weight:700;color:var(--grey);}
+  .arr .lbl.hot{color:var(--red);}
+
+  .tally{margin-top:auto;padding-top:14px;border-top:2px solid var(--line);padding-top:11px;display:flex;gap:26px;}
+  .tallyitem{flex:1 1 0;}
+  .tk{font-size:15px;font-weight:700;color:var(--grey);}
+  .tv{font-size:23px;font-weight:800;color:var(--ink);margin-top:2px;}
+  .tv.hot{color:var(--red);}
+</style>
+</head>
+<body>
+<div class="stage">
+ <div class="cols">
+
+  <div class="col">
+    <div class="colhead">A · 운영 중인 기준 시스템</div>
+    <div class="colsub">PostgreSQL + pgvector</div>
+
+    <div class="box soft"><div class="bt soft">사용자 질의</div><div class="bd">· 한국어 자연어</div></div>
+    <div class="arr"><svg width="18" height="22"><line x1="9" y1="0" x2="9" y2="13" stroke="#8a8a8a" stroke-width="3"/><polygon points="2,12 16,12 9,21" fill="#8a8a8a"/></svg></div>
+
+    <div class="box"><div class="num">1</div><div class="bt">애플리케이션</div></div>
+    <div class="arr"><div class="lbl hot">네트워크 경계 ①</div><svg width="18" height="22"><line x1="9" y1="0" x2="9" y2="13" stroke="#1a1a1a" stroke-width="3"/><polygon points="2,12 16,12 9,21" fill="#1a1a1a"/></svg></div>
+
+    <div class="box"><div class="num">2</div><div class="bt">외부 임베딩 서비스</div><div class="bd">· BGE-M3 1024차원</div></div>
+    <div class="arr"><div class="lbl hot">네트워크 경계 ②</div><svg width="18" height="22"><line x1="9" y1="0" x2="9" y2="13" stroke="#1a1a1a" stroke-width="3"/><polygon points="2,12 16,12 9,21" fill="#1a1a1a"/></svg></div>
+
+    <div class="box"><div class="num">3</div><div class="bt">벡터 검색</div><div class="bd">· HNSW 근사 인덱스</div></div>
+    <div class="arr"><svg width="18" height="22"><line x1="9" y1="0" x2="9" y2="13" stroke="#1a1a1a" stroke-width="3"/><polygon points="2,12 16,12 9,21" fill="#1a1a1a"/></svg></div>
+
+    <div class="box soft"><div class="bt soft">답변 생성 (LLM)</div></div>
+
+    <div class="tally">
+      <div class="tallyitem"><div class="tk">네트워크 경계</div><div class="tv hot">2개</div></div>
+      <div class="tallyitem"><div class="tk">외부 모델 호출</div><div class="tv hot">있음</div></div>
+    </div>
+  </div>
+
+  <div class="col">
+    <div class="colhead">C · 이전 후 시스템</div>
+    <div class="colsub">Oracle AI Database 26ai</div>
+
+    <div class="box soft"><div class="bt soft">사용자 질의</div><div class="bd">· 한국어 자연어</div></div>
+    <div class="arr"><svg width="18" height="22"><line x1="9" y1="0" x2="9" y2="13" stroke="#8a8a8a" stroke-width="3"/><polygon points="2,12 16,12 9,21" fill="#8a8a8a"/></svg></div>
+
+    <div class="box"><div class="num">1</div><div class="bt">애플리케이션</div><div class="bd">· SQL 한 문장</div></div>
+    <div class="arr"><div class="lbl hot">네트워크 경계 ①</div><svg width="18" height="22"><line x1="9" y1="0" x2="9" y2="13" stroke="#1a1a1a" stroke-width="3"/><polygon points="2,12 16,12 9,21" fill="#1a1a1a"/></svg></div>
+
+    <div class="zone">
+      <div class="zonehead">데이터베이스 내부</div>
+      <div class="box"><div class="num">2</div><div class="bt">임베딩</div><div class="bd">· ONNX · e5-small 384차원</div></div>
+      <div class="box"><div class="num">3</div><div class="bt">벡터 검색</div><div class="bd">· 정확 검색</div></div>
+    </div>
+    <div class="arr"><svg width="18" height="22"><line x1="9" y1="0" x2="9" y2="13" stroke="#1a1a1a" stroke-width="3"/><polygon points="2,12 16,12 9,21" fill="#1a1a1a"/></svg></div>
+
+    <div class="box soft"><div class="bt soft">답변 생성 (LLM)</div></div>
+
+    <div class="tally">
+      <div class="tallyitem"><div class="tk">네트워크 경계</div><div class="tv">1개</div></div>
+      <div class="tallyitem"><div class="tk">외부 모델 호출</div><div class="tv">없음</div></div>
+    </div>
+  </div>
+
+ </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,253 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Figure 1 — decomposition of store and placement factors</title>
+<style>
+  :root{
+    --ink:#1a1a1a;
+    --grey:#8a8a8a;
+    --grey-mid:#6d6d6d;
+    --grey-fill:#e9e9e9;
+    --pill-border:#b7b7b7;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:#ffffff;}
+  body{
+    font-family:-apple-system, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .stage{
+    width:1366px;
+    padding:32px 34px 28px 34px;
+    background:#ffffff;
+  }
+  .row{
+    display:grid;
+    grid-template-columns:314px 160px 314px 160px 314px;
+    column-gap:9px;
+    align-items:stretch;
+  }
+
+  /* ---------- boxes ---------- */
+  .box{
+    display:flex;
+    flex-direction:column;
+    padding:16px 18px 14px 18px;
+    background:#ffffff;
+  }
+  .box-a{ border:2px solid var(--ink); }
+  .box-b{ border:2.5px dashed var(--ink); background:var(--grey-fill); }
+  .box-c{ border:3.5px solid var(--ink); }
+
+  .box-head{ display:flex; align-items:center; gap:12px; }
+  .badge{
+    width:56px; height:56px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    font-weight:800; font-size:27px;
+    flex:0 0 auto;
+  }
+  .badge-a{ background:#fff; border:2px solid var(--ink); color:var(--ink); }
+  .badge-b{ background:#fff; border:2.5px dashed var(--ink); color:var(--ink); }
+  .badge-c{ background:var(--ink); border:3.5px solid var(--ink); color:#fff; }
+
+  .role{
+    font-size:26px;
+    font-weight:650;
+    line-height:1.22;
+    color:var(--ink);
+  }
+
+  .divider{ border-top:1.5px solid #bdbdbd; margin:13px 0 11px 0; }
+
+  .rows{ display:flex; flex-direction:column; }
+  .r{ margin-bottom:9px; }
+  .r-label{
+    font-size:19px;
+    font-weight:700;
+    letter-spacing:0.05em;
+    text-transform:uppercase;
+    color:var(--grey);
+    line-height:1.15;
+  }
+  .r-value{
+    font-size:29px;
+    line-height:1.2;
+    margin-top:2px;
+  }
+  .v-base{ color:var(--ink); font-weight:500; }
+  .v-changed{ color:var(--ink); font-weight:800; }
+  .v-unchanged{ color:var(--grey-mid); font-weight:500; }
+
+  .sub{
+    margin-top:6px;
+    padding-top:6px;
+    border-top:1px dotted #c9c9c9;
+    font-size:20px;
+    font-style:italic;
+    color:var(--grey-mid);
+    font-weight:500;
+  }
+
+  /* ---------- arrow zones ---------- */
+  .az{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:flex-start;
+    padding:2px 8px 0 8px;
+  }
+  .az-label{
+    text-align:center;
+    text-transform:uppercase;
+    letter-spacing:0.04em;
+    line-height:1.14;
+  }
+  .az1 .az-label{ font-size:20px; font-weight:700; color:var(--grey-mid); margin-bottom:10px; }
+  .az2 .az-label{ font-size:21px; font-weight:800; color:var(--ink); margin-bottom:10px; }
+
+  .az svg{ display:block; margin-bottom:12px; }
+
+  .pill{
+    text-align:center;
+    padding:10px 8px;
+    border-radius:2px;
+    width:100%;
+  }
+  .pill-finding{ line-height:1.2; }
+  .pill-jlabel{
+    margin-top:8px;
+    text-transform:uppercase;
+    letter-spacing:0.04em;
+    line-height:1.15;
+  }
+  .pill-jval{
+    margin-top:3px;
+    font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    line-height:1.05;
+  }
+  .pill-1{
+    background:#ffffff;
+    border:1.5px solid var(--pill-border);
+  }
+  .pill-1 .pill-finding{ font-size:19px; font-weight:600; color:var(--grey-mid); }
+  .pill-1 .pill-jlabel{ font-size:15px; font-weight:600; color:#9a9a9a; }
+  .pill-1 .pill-jval{ font-size:24px; font-weight:600; color:var(--grey-mid); }
+
+  .pill-2{
+    background:#efe9e7;
+    border:2px solid var(--ink);
+  }
+  .pill-2 .pill-finding{ font-size:20px; font-weight:800; color:var(--ink); }
+  .pill-2 .pill-jlabel{ font-size:16px; font-weight:700; color:#5a5a5a; }
+  .pill-2 .pill-jval{ font-size:29px; font-weight:800; color:var(--ink); }
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="row">
+
+    <!-- BOX A -->
+    <div class="box box-a">
+      <div class="box-head">
+        <div class="badge badge-a">A</div>
+        <div class="role">deployed<br>baseline</div>
+      </div>
+      <div class="divider"></div>
+      <div class="rows">
+        <div class="r">
+          <div class="r-label">Store</div>
+          <div class="r-value v-base">PostgreSQL + pgvector</div>
+        </div>
+        <div class="r">
+          <div class="r-label">Model</div>
+          <div class="r-value v-base">BGE-M3, 1024-d</div>
+        </div>
+        <div class="r">
+          <div class="r-label">Placement</div>
+          <div class="r-value v-base">external</div>
+        </div>
+        <div class="sub">search: HNSW (approximate)</div>
+      </div>
+    </div>
+
+    <!-- ARROW A -> B -->
+    <div class="az az1">
+      <div class="az-label">Store<br>factor</div>
+      <svg width="138" height="34" viewBox="0 0 138 34">
+        <line x1="4" y1="17" x2="118" y2="17" stroke="#6d6d6d" stroke-width="4" stroke-linecap="round"/>
+        <polygon points="118,7 136,17 118,27" fill="#6d6d6d"/>
+      </svg>
+      <div class="pill pill-1">
+        <div class="pill-finding">no detectable<br>effect</div>
+        <div class="pill-jlabel">Top-10 Jaccard</div>
+        <div class="pill-jval">0.971</div>
+      </div>
+    </div>
+
+    <!-- BOX B -->
+    <div class="box box-b">
+      <div class="box-head">
+        <div class="badge badge-b">B</div>
+        <div class="role">bridge<br>condition</div>
+      </div>
+      <div class="divider"></div>
+      <div class="rows">
+        <div class="r">
+          <div class="r-label">Store</div>
+          <div class="r-value v-changed">Oracle AI Database 26ai</div>
+        </div>
+        <div class="r">
+          <div class="r-label">Model</div>
+          <div class="r-value v-unchanged">BGE-M3, 1024-d</div>
+        </div>
+        <div class="r">
+          <div class="r-label">Placement</div>
+          <div class="r-value v-unchanged">external</div>
+        </div>
+        <div class="sub">search: exact &middot; added for measurement only</div>
+      </div>
+    </div>
+
+    <!-- ARROW B -> C -->
+    <div class="az az2">
+      <div class="az-label">Placement<br>factor</div>
+      <svg width="138" height="46" viewBox="0 0 138 46">
+        <line x1="3" y1="23" x2="108" y2="23" stroke="#1a1a1a" stroke-width="10" stroke-linecap="butt"/>
+        <polygon points="104,5 136,23 104,41" fill="#1a1a1a"/>
+      </svg>
+      <div class="pill pill-2">
+        <div class="pill-finding">carries the<br>entire effect</div>
+        <div class="pill-jlabel">Top-10 Jaccard</div>
+        <div class="pill-jval">0.175</div>
+      </div>
+    </div>
+
+    <!-- BOX C -->
+    <div class="box box-c">
+      <div class="box-head">
+        <div class="badge badge-c">C</div>
+        <div class="role">migrated<br>system</div>
+      </div>
+      <div class="divider"></div>
+      <div class="rows">
+        <div class="r">
+          <div class="r-label">Store</div>
+          <div class="r-value v-unchanged">Oracle AI Database 26ai</div>
+        </div>
+        <div class="r">
+          <div class="r-label">Model</div>
+          <div class="r-value v-changed">multilingual-e5-small, 384-d</div>
+        </div>
+        <div class="r">
+          <div class="r-label">Placement</div>
+          <div class="r-value v-changed">in-database</div>
+        </div>
+        <div class="sub">search: exact</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</body>
+</html>

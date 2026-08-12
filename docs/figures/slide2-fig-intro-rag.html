@@ -1,0 +1,64 @@
+<!doctype html><html><head><meta charset="utf-8"><style>
+:root{ --ink:#1a1a1a; --grey:#6d6d6d; --line:#c2c2c2; --fill:#f1f1f1;
+       --blue:#3375BE; --bluefill:#eaf1f9; --red:#F94145; --redfill:#fdf0f0; }
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;background:#fff;}
+body{font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased;}
+.stage{width:1720px;background:#fff;}
+.t{font-weight:800;color:var(--ink);}
+.g{color:var(--grey);}
+.cap{font-size:19px;font-weight:600;color:var(--grey);text-align:center;}
+.stage{padding:24px 26px;}</style></head><body><div class="stage">
+<style>
+ .pipe{display:flex;align-items:stretch;gap:0;}
+ .node{flex:1 1 0;border:2.5px solid var(--ink);padding:14px 10px;text-align:center;background:#fff;}
+ .node.soft{border:2px solid var(--line);}
+ .node .n{font-size:26px;font-weight:800;color:var(--ink);}
+ .node.soft .n{font-weight:700;color:var(--grey);}
+ .node .s{font-size:17px;font-weight:600;color:var(--grey);margin-top:4px;}
+ .ar{flex:0 0 54px;display:flex;align-items:center;justify-content:center;}
+ .brace{margin-top:10px;display:flex;}
+ .bsp{flex:0 0 0;}
+ .bwrap{border-top:3px solid var(--blue);border-left:3px solid var(--blue);
+        border-right:3px solid var(--blue);height:14px;}
+ .blab{text-align:center;font-size:22px;font-weight:800;color:var(--blue);margin-top:8px;}
+ .bsub{text-align:center;font-size:19px;font-weight:600;color:var(--grey);margin-top:2px;}
+ .split{height:2px;background:var(--line);margin:26px 0 22px 0;}
+ .path{display:flex;align-items:center;gap:26px;}
+ .pbox{flex:1 1 0;border:2.5px solid var(--ink);background:#fff;padding:14px 18px;}
+ .pbox.to{background:var(--fill);}
+ .pk{font-size:16px;font-weight:700;color:var(--grey);letter-spacing:.03em;}
+ .pv{font-size:25px;font-weight:800;color:var(--ink);margin-top:3px;line-height:1.2;}
+ .pnote{font-size:18px;font-weight:600;color:var(--grey);margin-top:6px;font-style:italic;}
+</style>
+<div class="pipe">
+  <div class="node soft"><div class="n">User query</div></div>
+  <div class="ar"><svg width="34" height="20"><line x1="0" y1="10" x2="24" y2="10" stroke="#8a8a8a" stroke-width="3"/><polygon points="22,3 22,17 34,10" fill="#8a8a8a"/></svg></div>
+  <div class="node"><div class="n">Embedding model</div><div class="s">text &#8594; vector</div></div>
+  <div class="ar"><svg width="34" height="20"><line x1="0" y1="10" x2="24" y2="10" stroke="#1a1a1a" stroke-width="3"/><polygon points="22,3 22,17 34,10" fill="#1a1a1a"/></svg></div>
+  <div class="node"><div class="n">Store</div><div class="s">index &amp; search</div></div>
+  <div class="ar"><svg width="34" height="20"><line x1="0" y1="10" x2="24" y2="10" stroke="#8a8a8a" stroke-width="3"/><polygon points="22,3 22,17 34,10" fill="#8a8a8a"/></svg></div>
+  <div class="node soft"><div class="n">Language model</div><div class="s">grounded answer</div></div>
+</div>
+<div class="brace">
+  <div class="bsp" style="flex:0 0 22.4%"></div>
+  <div class="bwrap" style="flex:1 1 0;"></div>
+  <div class="bsp" style="flex:0 0 22.4%"></div>
+</div>
+<div class="blab">VECTOR LAYER</div>
+<div class="bsub">the part that is replaced most often after deployment</div>
+<div class="split"></div>
+<div class="path">
+  <div class="pbox">
+    <div class="pk">FROM</div>
+    <div class="pv">General-purpose relational database<br>with a vector extension</div>
+    <div class="pnote">the embedding is computed outside</div>
+  </div>
+  <svg width="120" height="30"><line x1="0" y1="15" x2="96" y2="15" stroke="#1a1a1a" stroke-width="6"/><polygon points="94,2 94,28 120,15" fill="#1a1a1a"/></svg>
+  <div class="pbox to">
+    <div class="pk">TO</div>
+    <div class="pv">Converged database with a vector type<br>and an inference runtime inside it</div>
+    <div class="pnote">the database itself computes the embedding</div>
+  </div>
+</div>
+</div></body></html>

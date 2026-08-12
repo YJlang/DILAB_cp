@@ -1,0 +1,56 @@
+<!doctype html><html><head><meta charset="utf-8"><style>
+:root{ --ink:#1a1a1a; --grey:#6d6d6d; --line:#c2c2c2; --fill:#f1f1f1;
+       --blue:#3375BE; --bluefill:#eaf1f9; --red:#F94145; --redfill:#fdf0f0; }
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;background:#fff;}
+body{font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased;}
+.stage{width:1720px;background:#fff;}
+.t{font-weight:800;color:var(--ink);}
+.g{color:var(--grey);}
+.cap{font-size:19px;font-weight:600;color:var(--grey);text-align:center;}
+.stage{padding:24px 26px;}</style></head><body><div class="stage">
+<style>
+ .panels{display:flex;gap:34px;}
+ .p{flex:1 1 0;border:2.5px solid var(--line);padding:16px 20px 18px 20px;background:#fff;}
+ .pt{font-size:20px;font-weight:700;color:var(--grey);letter-spacing:.02em;}
+ .pv{font-size:52px;font-weight:800;color:var(--red);line-height:1.05;margin-top:2px;
+      font-variant-numeric:tabular-nums;}
+ .ps{font-size:18px;font-weight:600;color:var(--grey);margin-top:2px;}
+ .track{position:relative;height:22px;background:var(--fill);border:1.5px solid var(--line);
+         margin-top:14px;}
+ .fillbar{position:absolute;left:0;top:0;bottom:0;background:var(--red);opacity:.85;}
+ .mark{position:absolute;top:-6px;bottom:-6px;width:4px;background:var(--ink);}
+ .thr{position:absolute;top:-6px;bottom:-6px;width:3px;background:var(--grey);}
+ .ends{display:flex;justify-content:space-between;font-size:16px;font-weight:700;
+        color:var(--grey);margin-top:5px;}
+ .ends.rel{position:relative;}
+ .thrlab{position:absolute;top:0;transform:translateX(-50%);white-space:nowrap;
+          color:var(--ink);font-size:16px;font-weight:800;}
+ .verdict{margin-top:24px;border:2.5px solid var(--red);background:var(--redfill);padding:13px 18px;
+           text-align:center;font-size:27px;font-weight:800;color:var(--red);}
+</style>
+<div class="panels">
+  <div class="p">
+    <div class="pt">TOP-10 JACCARD</div>
+    <div class="pv">0.175</div>
+    <div class="ps">95% CI [0.133, 0.221]</div>
+    <div class="track"><div class="fillbar" style="width:17.5%"></div></div>
+    <div class="ends"><span>0.0 &nbsp;no overlap</span><span>identical&nbsp; 1.0</span></div>
+  </div>
+  <div class="p">
+    <div class="pt">P VALUE &middot; RELEVANCE</div>
+    <div class="pv">0.003</div>
+    <div class="ps">chance is an unlikely explanation</div>
+    <div class="track"><div class="thr" style="left:56.6%"></div><div class="mark" style="left:15.9%"></div></div>
+    <div class="ends rel"><span>0.001</span><span class="thrlab" style="left:56.6%">&#9650; 0.05</span><span>1.0</span></div>
+  </div>
+  <div class="p">
+    <div class="pt">EFFECT SIZE |dz|</div>
+    <div class="pv">0.473</div>
+    <div class="ps">medium</div>
+    <div class="track"><div class="fillbar" style="width:47.3%"></div></div>
+    <div class="ends"><span>0.0</span><span>1.0</span></div>
+  </div>
+</div>
+<div class="verdict">PLACEMENT FACTOR &mdash; a significant, medium-sized effect</div>
+</div></body></html>

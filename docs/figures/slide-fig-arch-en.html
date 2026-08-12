@@ -1,0 +1,100 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>System architecture comparison</title>
+<style>
+  :root{ --ink:#1a1a1a; --grey:#6d6d6d; --line:#c2c2c2; --fill:#f1f1f1; --red:#F94145; }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:#fff;}
+  body{font-family:-apple-system,"Apple SD Gothic Neo","맑은 고딕","Malgun Gothic",sans-serif;
+       -webkit-font-smoothing:antialiased;}
+  .stage{width:1720px;padding:22px 24px 18px 24px;background:#fff;}
+  .cols{display:flex;gap:56px;align-items:stretch;}
+  .col{flex:1 1 0;min-width:0;display:flex;flex-direction:column;}
+
+  .colhead{font-size:26px;font-weight:800;color:var(--ink);margin-bottom:4px;}
+  .colsub{font-size:18px;font-weight:600;color:var(--grey);margin-bottom:14px;}
+
+  .box{border:2.5px solid var(--ink);padding:10px 14px;background:#fff;display:flex;
+       align-items:center;gap:10px;}
+  .box.soft{border:2px solid var(--line);}
+  .num{width:28px;height:28px;border-radius:50%;flex:0 0 auto;background:var(--ink);color:#fff;
+       display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;}
+  .bt{font-size:21px;font-weight:800;color:var(--ink);}
+  .bd{font-size:17px;font-weight:600;color:var(--grey);}
+  .bt.soft{font-weight:700;color:var(--grey);}
+
+  .zone{border:2.5px dashed var(--ink);background:var(--fill);padding:11px 12px 12px 12px;}
+  .zonehead{font-size:19px;font-weight:800;color:var(--ink);margin-bottom:9px;}
+  .zone .box{background:#fff;}
+  .zone .box + .box{margin-top:9px;}
+
+  .arr{display:flex;align-items:center;justify-content:center;gap:9px;padding:5px 0;}
+  .arr .lbl{font-size:16px;font-weight:700;color:var(--grey);}
+  .arr .lbl.hot{color:var(--red);}
+
+  .tally{margin-top:auto;padding-top:14px;border-top:2px solid var(--line);padding-top:11px;display:flex;gap:26px;}
+  .tallyitem{flex:1 1 0;}
+  .tk{font-size:15px;font-weight:700;color:var(--grey);}
+  .tv{font-size:23px;font-weight:800;color:var(--ink);margin-top:2px;}
+  .tv.hot{color:var(--red);}
+</style>
+</head>
+<body>
+<div class="stage">
+ <div class="cols">
+
+  <div class="col">
+    <div class="colhead">A · Deployed baseline</div>
+    <div class="colsub">PostgreSQL + pgvector</div>
+
+    <div class="box soft"><div class="bt soft">User query</div><div class="bd">· Korean natural language</div></div>
+    <div class="arr"><svg width="18" height="22"><line x1="9" y1="0" x2="9" y2="13" stroke="#8a8a8a" stroke-width="3"/><polygon points="2,12 16,12 9,21" fill="#8a8a8a"/></svg></div>
+
+    <div class="box"><div class="num">1</div><div class="bt">Application</div></div>
+    <div class="arr"><div class="lbl hot">network boundary 1</div><svg width="18" height="22"><line x1="9" y1="0" x2="9" y2="13" stroke="#1a1a1a" stroke-width="3"/><polygon points="2,12 16,12 9,21" fill="#1a1a1a"/></svg></div>
+
+    <div class="box"><div class="num">2</div><div class="bt">External embedding service</div><div class="bd">· BGE-M3, 1024-d</div></div>
+    <div class="arr"><div class="lbl hot">network boundary 2</div><svg width="18" height="22"><line x1="9" y1="0" x2="9" y2="13" stroke="#1a1a1a" stroke-width="3"/><polygon points="2,12 16,12 9,21" fill="#1a1a1a"/></svg></div>
+
+    <div class="box"><div class="num">3</div><div class="bt">Vector search</div><div class="bd">· HNSW approximate index</div></div>
+    <div class="arr"><svg width="18" height="22"><line x1="9" y1="0" x2="9" y2="13" stroke="#1a1a1a" stroke-width="3"/><polygon points="2,12 16,12 9,21" fill="#1a1a1a"/></svg></div>
+
+    <div class="box soft"><div class="bt soft">Answer generation (LLM)</div></div>
+
+    <div class="tally">
+      <div class="tallyitem"><div class="tk">Network boundaries</div><div class="tv hot">2</div></div>
+      <div class="tallyitem"><div class="tk">External model call</div><div class="tv hot">yes</div></div>
+    </div>
+  </div>
+
+  <div class="col">
+    <div class="colhead">C · Migrated system</div>
+    <div class="colsub">Oracle AI Database 26ai</div>
+
+    <div class="box soft"><div class="bt soft">User query</div><div class="bd">· Korean natural language</div></div>
+    <div class="arr"><svg width="18" height="22"><line x1="9" y1="0" x2="9" y2="13" stroke="#8a8a8a" stroke-width="3"/><polygon points="2,12 16,12 9,21" fill="#8a8a8a"/></svg></div>
+
+    <div class="box"><div class="num">1</div><div class="bt">Application</div><div class="bd">· one SQL statement</div></div>
+    <div class="arr"><div class="lbl hot">network boundary 1</div><svg width="18" height="22"><line x1="9" y1="0" x2="9" y2="13" stroke="#1a1a1a" stroke-width="3"/><polygon points="2,12 16,12 9,21" fill="#1a1a1a"/></svg></div>
+
+    <div class="zone">
+      <div class="zonehead">Inside the database</div>
+      <div class="box"><div class="num">2</div><div class="bt">Embedding</div><div class="bd">· ONNX · e5-small, 384-d</div></div>
+      <div class="box"><div class="num">3</div><div class="bt">Vector search</div><div class="bd">· exact search</div></div>
+    </div>
+    <div class="arr"><svg width="18" height="22"><line x1="9" y1="0" x2="9" y2="13" stroke="#1a1a1a" stroke-width="3"/><polygon points="2,12 16,12 9,21" fill="#1a1a1a"/></svg></div>
+
+    <div class="box soft"><div class="bt soft">Answer generation (LLM)</div></div>
+
+    <div class="tally">
+      <div class="tallyitem"><div class="tk">Network boundaries</div><div class="tv">1</div></div>
+      <div class="tallyitem"><div class="tk">External model call</div><div class="tv">no</div></div>
+    </div>
+  </div>
+
+ </div>
+</div>
+</body>
+</html>

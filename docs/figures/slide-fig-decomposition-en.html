@@ -1,0 +1,127 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Factor decomposition — bridge condition</title>
+<style>
+  :root{
+    --ink:#1a1a1a;
+    --grey:#6d6d6d;
+    --line:#c2c2c2;
+    --fill:#f1f1f1;
+    --blue:#3375BE;      /* 템플릿 강조색 */
+    --red:#F94145;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:#fff;}
+  body{font-family:-apple-system,"Apple SD Gothic Neo","맑은 고딕","Malgun Gothic",sans-serif;
+       -webkit-font-smoothing:antialiased;}
+  .stage{width:1720px;padding:26px 24px 20px 24px;background:#fff;}
+  .row{display:flex;align-items:stretch;gap:0;}
+
+  .card{flex:0 0 386px;border:2.5px solid var(--ink);padding:16px 18px 14px 18px;background:#fff;}
+  .card.bridge{border-style:dashed;background:var(--fill);}
+  .head{display:flex;align-items:center;gap:11px;margin-bottom:10px;}
+  .badge{width:40px;height:40px;border-radius:50%;flex:0 0 auto;
+         display:flex;align-items:center;justify-content:center;
+         font-size:23px;font-weight:800;border:2.5px solid var(--ink);color:var(--ink);background:#fff;}
+  .badge.dashed{border-style:dashed;}
+  .badge.solid{background:var(--ink);color:#fff;}
+  .title{font-size:25px;font-weight:800;color:var(--ink);line-height:1.2;}
+  .sep{border-top:1.5px solid var(--line);margin:8px 0 11px 0;}
+
+  .kv{margin-bottom:9px;}
+  .k{font-size:16px;font-weight:700;color:var(--grey);letter-spacing:0.01em;}
+  .v{font-size:22px;font-weight:700;color:var(--ink);line-height:1.25;margin-top:1px;}
+  .v.dim{font-weight:600;color:#8c8c8c;}
+  .foot{border-top:1.5px dotted var(--line);margin-top:11px;padding-top:8px;
+        font-size:17px;font-weight:600;color:var(--grey);font-style:italic;}
+
+  .gap{flex:1 1 auto;display:flex;flex-direction:column;align-items:center;
+       justify-content:center;padding:0 14px;min-width:208px;}
+  .factor{font-size:21px;font-weight:800;color:var(--ink);text-align:center;
+          line-height:1.2;margin-bottom:9px;}
+  .factor.soft{color:var(--grey);}
+  .arrow{width:100%;height:20px;display:flex;align-items:center;justify-content:center;margin-bottom:10px;}
+  .verdict{border:2px solid var(--line);padding:9px 12px;text-align:center;background:#fff;width:100%;}
+  .verdict.hot{border-color:var(--red);background:#fdf0f0;}
+  .vt{font-size:17px;font-weight:700;color:var(--grey);line-height:1.25;}
+  .vt.hot{color:var(--red);}
+  .vn{font-size:15px;font-weight:700;color:var(--grey);margin-top:6px;letter-spacing:0.02em;}
+  .vv{font-size:27px;font-weight:800;color:var(--ink);font-variant-numeric:tabular-nums;margin-top:1px;}
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="row">
+
+    <div class="card">
+      <div class="head">
+        <div class="badge">A</div>
+        <div class="title">deployed<br>baseline</div>
+      </div>
+      <div class="sep"></div>
+      <div class="kv"><div class="k">STORE</div><div class="v">PostgreSQL + pgvector</div></div>
+      <div class="kv"><div class="k">EMBEDDING MODEL</div><div class="v">BGE-M3 · 1024-d</div></div>
+      <div class="kv"><div class="k">PLACEMENT</div><div class="v">external</div></div>
+      <div class="foot">search: HNSW (approximate)</div>
+    </div>
+
+    <div class="gap">
+      <div class="factor soft">STORE FACTOR</div>
+      <div class="arrow">
+        <svg width="150" height="20" viewBox="0 0 150 20">
+          <line x1="0" y1="10" x2="126" y2="10" stroke="#6d6d6d" stroke-width="4"/>
+          <polygon points="126,2 126,18 148,10" fill="#6d6d6d"/>
+        </svg>
+      </div>
+      <div class="verdict">
+        <div class="vt">no detectable effect</div>
+        <div class="vn">TOP-10 JACCARD</div>
+        <div class="vv">0.971</div>
+      </div>
+    </div>
+
+    <div class="card bridge">
+      <div class="head">
+        <div class="badge dashed">B</div>
+        <div class="title">bridge condition<br><span style="font-size:19px;font-weight:700;color:#6d6d6d;">(proposed)</span></div>
+      </div>
+      <div class="sep"></div>
+      <div class="kv"><div class="k">STORE</div><div class="v">Oracle AI Database 26ai</div></div>
+      <div class="kv"><div class="k">EMBEDDING MODEL</div><div class="v dim">BGE-M3 · 1024-d</div></div>
+      <div class="kv"><div class="k">PLACEMENT</div><div class="v dim">external</div></div>
+      <div class="foot">loaded with A&#8217;s vectors · no re-embedding</div>
+    </div>
+
+    <div class="gap">
+      <div class="factor">PLACEMENT FACTOR</div>
+      <div class="arrow">
+        <svg width="150" height="20" viewBox="0 0 150 20">
+          <line x1="0" y1="10" x2="126" y2="10" stroke="#1a1a1a" stroke-width="6"/>
+          <polygon points="126,0 126,20 150,10" fill="#1a1a1a"/>
+        </svg>
+      </div>
+      <div class="verdict hot">
+        <div class="vt hot">carries the entire effect</div>
+        <div class="vn">TOP-10 JACCARD</div>
+        <div class="vv">0.175</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="head">
+        <div class="badge solid">C</div>
+        <div class="title">migrated<br>system</div>
+      </div>
+      <div class="sep"></div>
+      <div class="kv"><div class="k">STORE</div><div class="v dim">Oracle AI Database 26ai</div></div>
+      <div class="kv"><div class="k">EMBEDDING MODEL</div><div class="v">multilingual-e5-small · 384-d</div></div>
+      <div class="kv"><div class="k">PLACEMENT</div><div class="v">in-database</div></div>
+      <div class="foot">search: exact</div>
+    </div>
+
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,61 @@
+<!doctype html><html><head><meta charset="utf-8"><style>
+:root{ --ink:#1a1a1a; --grey:#6d6d6d; --line:#c2c2c2; --fill:#f1f1f1;
+       --blue:#3375BE; --bluefill:#eaf1f9; --red:#F94145; --redfill:#fdf0f0; }
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;background:#fff;}
+body{font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased;}
+.stage{width:1720px;background:#fff;}
+.t{font-weight:800;color:var(--ink);}
+.g{color:var(--grey);}
+.cap{font-size:19px;font-weight:600;color:var(--grey);text-align:center;}
+.stage{padding:24px 26px;}</style></head><body><div class="stage">
+<style>
+ .row{display:flex;align-items:center;gap:0;}
+ .card{flex:1 1 0;border:2.5px solid var(--ink);background:#fff;}
+ .ch{padding:12px 18px;border-bottom:2.5px solid var(--ink);}
+ .ch .cn{font-size:27px;font-weight:800;color:var(--ink);}
+ .ch .cs{font-size:18px;font-weight:600;color:var(--grey);margin-top:1px;}
+ .attr{display:flex;align-items:center;padding:11px 18px;border-bottom:1.5px solid var(--line);}
+ .attr:last-child{border-bottom:none;}
+ .attr.hot{background:var(--redfill);}
+ .ak{flex:0 0 156px;font-size:16px;font-weight:700;color:var(--grey);letter-spacing:.02em;}
+ .av{font-size:21px;font-weight:800;color:var(--ink);}
+ .attr.hot .av{color:var(--red);}
+ .mid{flex:0 0 430px;display:flex;flex-direction:column;align-items:center;padding:0 18px;}
+ .mlab{font-size:23px;font-weight:800;color:var(--ink);letter-spacing:.04em;margin-bottom:9px;}
+ .chip{border:2px solid var(--red);background:var(--redfill);color:var(--red);
+       font-size:18px;font-weight:800;padding:7px 14px;margin-top:11px;white-space:nowrap;}
+ .foot{margin-top:22px;border-top:2.5px solid var(--line);padding-top:16px;
+       display:flex;align-items:center;justify-content:center;gap:22px;}
+ .fbox{border:2.5px solid var(--ink);background:var(--fill);padding:11px 22px;
+       font-size:23px;font-weight:800;color:var(--ink);}
+ .fq{font-size:34px;font-weight:800;color:var(--red);}
+ .fnote{font-size:21px;font-weight:700;color:var(--red);}
+</style>
+<div class="row">
+  <div class="card">
+    <div class="ch"><div class="cn">A &middot; deployed baseline</div><div class="cs">before the migration</div></div>
+    <div class="attr hot"><div class="ak">STORE</div><div class="av">PostgreSQL + pgvector</div></div>
+    <div class="attr hot"><div class="ak">PLACEMENT</div><div class="av">outside the database</div></div>
+    <div class="attr"><div class="ak">RETRIEVAL RULE</div><div class="av">identical</div></div>
+  </div>
+  <div class="mid">
+    <div class="mlab">ONE MIGRATION</div>
+    <svg width="190" height="34"><line x1="0" y1="17" x2="160" y2="17" stroke="#1a1a1a" stroke-width="7"/><polygon points="158,2 158,32 190,17" fill="#1a1a1a"/></svg>
+    <div class="chip">&#9312; store factor</div>
+    <div class="chip">&#9313; placement factor</div>
+  </div>
+  <div class="card">
+    <div class="ch"><div class="cn">C &middot; migrated system</div><div class="cs">after the migration</div></div>
+    <div class="attr hot"><div class="ak">STORE</div><div class="av">Oracle AI Database 26ai</div></div>
+    <div class="attr hot"><div class="ak">PLACEMENT</div><div class="av">inside the database</div></div>
+    <div class="attr"><div class="ak">RETRIEVAL RULE</div><div class="av">identical</div></div>
+  </div>
+</div>
+<div class="foot">
+  <div class="fbox">a single before-and-after comparison</div>
+  <svg width="60" height="24"><line x1="0" y1="12" x2="40" y2="12" stroke="#6d6d6d" stroke-width="4"/><polygon points="38,2 38,22 60,12" fill="#6d6d6d"/></svg>
+  <div class="fq">?</div>
+  <div class="fnote">which factor caused it cannot be told</div>
+</div>
+</div></body></html>
