@@ -1,9 +1,16 @@
-"""발표 대본 Markdown → 인쇄용 PDF.
+"""발표 대본 Markdown → PDF 두 벌.
 
 무대에서 들고 읽는 큐시트다. 화면용 문서와 요구가 다르다.
   · 슬라이드 한 장 분량이 페이지 경계에서 잘리면 안 된다 (page-break-inside: avoid)
   · 시간·슬라이드 번호가 고개만 내려도 눈에 들어와야 한다
   · 연출 지시(호흡·손짓)와 낭독할 문장이 한눈에 구분돼야 한다
+
+판이 둘인 이유는 읽는 거리가 다르기 때문이다.
+  · print  — 연단에 놓고 서서 내려다본다. 그래서 12.5pt.
+  · mobile — 손에 들고 본다. 여기서 중요한 건 글자 크기가 아니라 **한 줄에 들어가는
+             글자 수**다. 뷰어가 페이지를 화면 폭에 맞추므로, A4(한 줄 45자 남짓)는
+             글자를 아무리 키워도 같은 비율로 함께 줄어든다. 페이지를 폰 비율로
+             좁혀 한 줄을 20자 안팎으로 만들어야 실제로 커진다.
 """
 import html
 import re
@@ -12,55 +19,75 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 SRC = HERE / "발표대본_PyGeek2026.md"
-DST = HERE / "발표대본_PyGeek2026.pdf"
 CHROME = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
 
+PROFILES = {
+    "print": {
+        "out": "발표대본_PyGeek2026.pdf",
+        "page": "A4 portrait",
+        "margin": "13mm 14mm 13mm 14mm",
+        "base": 12.5,
+        "table": 10.4,
+        "gap": 13,          # 슬라이드 블록 사이 여백(pt)
+    },
+    "mobile": {
+        "out": "발표대본_PyGeek2026_모바일.pdf",
+        "page": "92mm 164mm",     # 9:16 — 폰 화면에 꽉 찬다
+        "margin": "6mm 5mm 6mm 5mm",
+        "base": 11.5,
+        "table": 6.6,             # 5단 표는 좁은 폭에서만 줄인다
+        "gap": 10,
+    },
+}
+
 CSS = """
-@page { size: A4 portrait; margin: 14mm 15mm 14mm 15mm; }
+@page { size: {{PAGE}}; margin: {{MARGIN}}; }
 *{box-sizing:border-box;}
 html,body{margin:0;padding:0;}
 body{
   font-family:"Apple SD Gothic Neo","Malgun Gothic",-apple-system,sans-serif;
-  font-size:10.8pt; line-height:1.62; color:#16181d;
+  font-size:{{BASE}}pt; line-height:1.62; color:#16181d;
   -webkit-font-smoothing:antialiased;
 }
-h1{font-size:19pt;font-weight:800;margin:0 0 4pt 0;letter-spacing:-.01em;}
-h1.sub{font-size:15pt;margin-top:16pt;border-top:1.5pt solid #16181d;padding-top:10pt;}
-.meta{font-size:9.4pt;color:#5b6270;line-height:1.5;margin-bottom:12pt;
+h1{font-size:{{H1}}pt;font-weight:800;margin:0 0 4pt 0;letter-spacing:-.01em;}
+h1.sub{font-size:{{H1SUB}}pt;margin-top:16pt;border-top:1.5pt solid #16181d;padding-top:10pt;}
+.meta{font-size:{{META}}pt;color:#5b6270;line-height:1.5;margin-bottom:12pt;
       border-left:2.5pt solid #3375BE;padding-left:9pt;}
 .meta b{color:#16181d;}
 
-h2.head{font-size:12pt;font-weight:800;margin:0 0 7pt 0;color:#16181d;}
+h2.head{font-size:{{HEAD}}pt;font-weight:800;margin:0 0 7pt 0;color:#16181d;}
 
 /* 슬라이드 한 덩어리 — 페이지 경계에서 쪼개지 않는다 */
-.slide{break-inside:avoid;page-break-inside:avoid;margin:0 0 13pt 0;
+.slide{break-inside:avoid;page-break-inside:avoid;margin:0 0 {{GAP}}pt 0;
        border-top:1pt solid #d7dbe2;padding-top:9pt;}
 .slide.key{border-top:2.2pt solid #F94145;}
-.bar{display:flex;align-items:baseline;gap:8pt;margin-bottom:6pt;}
-.num{flex:0 0 auto;background:#16181d;color:#fff;font-size:10pt;font-weight:800;
+/* 좁은 판에서는 제목이 길어 시각(時刻)이 밀린다. 밀리면 아랫줄로 내려보낸다. */
+.bar{display:flex;flex-wrap:wrap;align-items:baseline;gap:5pt 8pt;margin-bottom:6pt;}
+.num{flex:0 0 auto;background:#16181d;color:#fff;font-size:{{NUM}}pt;font-weight:800;
      padding:1.5pt 7pt;border-radius:2pt;}
 .slide.key .num{background:#F94145;}
-.ttl{flex:1 1 auto;font-size:12pt;font-weight:800;}
+.ttl{flex:1 1 auto;min-width:0;font-size:{{TTL}}pt;font-weight:800;}
 .star{color:#F94145;}
-.time{flex:0 0 auto;font-size:10.2pt;font-weight:800;color:#3375BE;
+.time{flex:0 0 auto;margin-left:auto;font-size:{{TIME}}pt;font-weight:800;color:#3375BE;
       font-variant-numeric:tabular-nums;white-space:nowrap;}
 
 p{margin:0 0 6.5pt 0;}
 strong{font-weight:800;color:#000;}
 .cue{border-left:3pt solid #F94145;background:#fdf3f3;padding:6pt 9pt;
-     margin:0 0 7pt 0;font-size:10.2pt;font-weight:700;color:#c0272b;}
+     margin:0 0 7pt 0;font-size:{{CUE}}pt;font-weight:700;color:#c0272b;}
 .opt{color:#7b8290;}
 .opt::before{content:"";}
 .stage{color:#5b6270;font-weight:600;}
 
-table{border-collapse:collapse;width:100%;font-size:9.3pt;margin:0 0 10pt 0;
+table{border-collapse:collapse;width:100%;font-size:{{TABLE}}pt;margin:0 0 10pt 0;
       break-inside:avoid;page-break-inside:avoid;}
-th,td{border-bottom:.7pt solid #d7dbe2;padding:3.4pt 5pt;text-align:left;}
+th,td{border-bottom:.7pt solid #d7dbe2;padding:3.4pt 4pt;text-align:left;
+      word-break:keep-all;}
 thead th{background:#16181d;color:#fff;font-weight:700;border-bottom:none;}
 td.c,th.c{text-align:center;}
 tbody tr.k td{background:#fff6f6;}
 
-h3{font-size:11pt;font-weight:800;margin:11pt 0 4pt 0;break-after:avoid;page-break-after:avoid;}
+h3{font-size:{{H3}}pt;font-weight:800;margin:11pt 0 4pt 0;break-after:avoid;page-break-after:avoid;}
 .qa{break-inside:avoid;page-break-inside:avoid;margin-bottom:9pt;}
 ul{margin:0 0 8pt 0;padding-left:15pt;}
 li{margin-bottom:3.5pt;}
@@ -77,7 +104,8 @@ def inline(s: str) -> str:
     s = re.sub(r"`([^`]+)`", r'<code>\1</code>', s)
     s = re.sub(r"\*\*(.+?)\*\*", r"<strong>\1</strong>", s)
     s = s.replace("★", '<span class="star">★</span>')
-    s = re.sub(r"〈생략 가능〉", '<span class="opt">〈생략 가능〉</span>', s)
+    # 〈…〉 는 낭독하지 않는 표식이다. 종류를 늘려도 회색으로 빠지도록 통째로 잡는다.
+    s = re.sub(r"〈[^〉]*〉", lambda m: f'<span class="opt">{m.group(0)}</span>', s)
     return s
 
 
@@ -201,20 +229,45 @@ def convert(md: str) -> str:
     return "\n".join(out)
 
 
-def main():
-    md = SRC.read_text(encoding="utf-8")
-    tmp = HERE / "_script_print.html"
+def css_for(p: dict) -> str:
+    """본문 크기 하나에서 나머지를 비례로 끌어낸다. 판을 바꿔도 위계가 유지된다."""
+    b = p["base"]
+    sizes = {
+        "PAGE": p["page"], "MARGIN": p["margin"], "GAP": p["gap"],
+        "BASE": b, "TABLE": p["table"],
+        "H1": round(b * 1.52, 1), "H1SUB": round(b * 1.24, 1),
+        "META": round(b * 0.87, 1), "HEAD": round(b * 1.06, 1),
+        "NUM": round(b * 0.90, 1), "TTL": round(b * 1.06, 1),
+        "TIME": round(b * 0.92, 1), "CUE": round(b * 0.94, 1),
+        "H3": round(b * 0.98, 1),
+    }
+    css = CSS
+    for k, v in sizes.items():
+        css = css.replace("{{%s}}" % k, str(v))
+    return css
+
+
+def render(profile: str, body: str) -> Path:
+    p = PROFILES[profile]
+    dst = HERE / p["out"]
+    tmp = HERE / f"_script_{profile}.html"
     tmp.write_text(
         f'<!doctype html><html lang="ko"><head><meta charset="utf-8">'
-        f"<title>PyGeek 2026 발표 대본</title><style>{CSS}</style></head>"
-        f"<body>{convert(md)}</body></html>", encoding="utf-8")
+        f"<title>PyGeek 2026 발표 대본</title><style>{css_for(p)}</style></head>"
+        f"<body>{body}</body></html>", encoding="utf-8")
     subprocess.run(
         [CHROME, "--headless", "--disable-gpu", "--no-pdf-header-footer",
-         f"--print-to-pdf={DST}", f"file://{tmp}"],
+         f"--print-to-pdf={dst}", f"file://{tmp}"],
         check=True, capture_output=True)
     tmp.unlink()
-    return DST
+    return dst
+
+
+def main():
+    body = convert(SRC.read_text(encoding="utf-8"))
+    return [render(name, body) for name in PROFILES]
 
 
 if __name__ == "__main__":
-    print(f"저장: {main()}")
+    for f in main():
+        print(f"저장: {f}")
