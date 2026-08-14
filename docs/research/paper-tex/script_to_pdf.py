@@ -113,12 +113,20 @@ def convert(md: str) -> str:
     lines = md.split("\n")
     out, i = [], 0
     in_slide = False
+    in_qa = False
+    in_body = False            # 첫 슬라이드를 지났는가 — 인용의 성격이 여기서 갈린다
 
     def close_slide():
         nonlocal in_slide
         if in_slide:
             out.append("</section>")
             in_slide = False
+
+    def close_qa():
+        nonlocal in_qa
+        if in_qa:
+            out.append("</div>")
+            in_qa = False
 
     while i < len(lines):
         ln = lines[i]
@@ -143,7 +151,9 @@ def convert(md: str) -> str:
         # 슬라이드 블록 머리 — "## 4 · 1. Introduction — 두 요인 ★ `1:45–3:05`"
         m = re.match(r"^## (\d+) · (.+?)\s*`([^`]+)`\s*$", ln)
         if m:
+            close_qa()
             close_slide()
+            in_body = True
             n, title, t = m.group(1), m.group(2), m.group(3)
             key = "★" in title
             out.append(f'<section class="slide{" key" if key else ""}">')
@@ -154,24 +164,25 @@ def convert(md: str) -> str:
             i += 1
             continue
 
+        # 답변 본문은 아래 일반 처리기에 맡기고 여기서는 상자만 연다. 답변 안에서
+        # 줄을 직접 소비하면 표·목록이 문단으로 찍히므로, 경계에서 close_qa() 로 닫는다.
         if ln.startswith("### "):
+            close_qa()
             close_slide()
             out.append(f'<div class="qa"><h3>{inline(ln[4:])}</h3>')
+            in_qa = True
             i += 1
-            while i < len(lines) and not lines[i].startswith(("### ", "---", "# ")):
-                if lines[i].strip():
-                    out.append(f"<p>{inline(lines[i].strip())}</p>")
-                i += 1
-            out.append("</div>")
             continue
 
         if ln.startswith("## "):
+            close_qa()
             close_slide()
             out.append(f'<h2 class="head">{inline(ln[3:])}</h2>')
             i += 1
             continue
 
         if ln.startswith("# "):
+            close_qa()
             close_slide()
             t = ln[2:].strip()
             # 새 쪽은 Q&A 앞에서만 뗀다. 체크리스트까지 떼면 다섯 줄짜리
@@ -184,18 +195,17 @@ def convert(md: str) -> str:
             continue
 
         if ln.startswith("> "):
+            close_qa()
             buf = []
             while i < len(lines) and lines[i].startswith(">"):
                 buf.append(lines[i].lstrip("> ").rstrip())
                 i += 1
             rows = [x for x in buf if x]
-            # 연출 지시인지 단순 안내인지는 낱말로 가른다.
-            # 굵은 글씨 유무로 가르면 머리말까지 연출 지시로 물든다.
-            CUE = ("호흡", "쉬고", "천천히", "읽지 않습니다", "짚으면서",
-                   "청중을 보며", "정상 속도", "짧게 시작")
-            body = " ".join(rows)
-            if any(k in body for k in CUE):
-                out.append(f'<div class="cue">{inline(body)}</div>')
+            # 첫 슬라이드 앞에 오는 인용은 문서 머리말 하나뿐이고, 그 뒤의 인용은
+            # 전부 무대에서 지킬 지시다. 낱말 목록으로 가르면 지시를 하나 더할
+            # 때마다 목록을 늘려야 하고, 빠뜨리면 조용히 머리말 모양으로 찍힌다.
+            if in_body:
+                out.append(f'<div class="cue">{inline(" ".join(rows))}</div>')
             else:                                   # 머리말은 줄바꿈을 살린다
                 out.append('<div class="meta">'
                            + "<br>".join(inline(r) for r in rows) + "</div>")
@@ -218,6 +228,7 @@ def convert(md: str) -> str:
             continue
 
         if ln.strip() in ("---", "___"):
+            close_qa()
             i += 1
             continue
 
@@ -225,6 +236,7 @@ def convert(md: str) -> str:
             out.append(f"<p>{inline(ln.strip())}</p>")
         i += 1
 
+    close_qa()
     close_slide()
     return "\n".join(out)
 
